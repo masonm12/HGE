@@ -160,6 +160,10 @@ SOURCE=.\input.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\power.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\random.cpp
 # End Source File
 # Begin Source File

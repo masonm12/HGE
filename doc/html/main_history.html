@@ -17,6 +17,20 @@
 <td valign=top>
 <table width=566 cellspacing=0 cellpadding=20 border=0><tr><td>
 <h1 style="margin-top:0px">Version history</h1>
+<h2>Version 1.8, 12 October 2007</h2>
+<ul>
+<li><a href="hgeconst_systemstate.html#HGE_POWERSTATUS">HGE_POWERSTATUS</a> system state added
+<li><a href="main_power.html">Power management recommendations</a> added
+<li>Fixed a crash when using <a href="hgeconst_systemstate.html#HGE_HWNDPARENT">HGE_HWNDPARENT</a> system state
+<li><a href="hgefont_getprewidth.html">hgeFont::GetPreWidth</a> and <a href="hgefont_getpostwidth.html">hgeFont::GetPostWidth</a> were added
+<li><a href="hgefont_getstringwidth.html">hgeFont::GetStringWidth</a> now have additional parameter <b>bMultiline</b>
+<li><a href="hgeparticle_setscale.html">hgeParticleSystem::SetScale</a> and <a href="hgeparticle_getscale.html">hgeParticleSystem::GetScale</a> were added
+<li>HGE now correctly handles window (de)activation done by clicking the taskbar tab
+<li>HGE now correctly handles changes of desktop color depth on the fly
+<li>Several potential memory leaks were fixed
+<li>Several minor fixes in documentation
+</ul>
+
 <h2>Version 1.7, 30 May 2007</h2>
 <ul>
 <li><a href="hgeconst_systemstate.html#HGE_SHOWSPLASH">HGE_SHOWSPLASH</a> system state added instead of earlier hack with <b>(hgeIntState)14</b>

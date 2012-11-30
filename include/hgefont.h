@@ -57,8 +57,10 @@ public:
 	float		GetSpacing() const {return fSpacing;}
 
 	hgeSprite*	GetSprite(char chr) const { return letters[(unsigned char)chr]; }
+	float		GetPreWidth(char chr) const { return pre[(unsigned char)chr]; }
+	float		GetPostWidth(char chr) const { return post[(unsigned char)chr]; }
 	float		GetHeight() const { return fHeight; }
-	float		GetStringWidth(const char *string) const;
+	float		GetStringWidth(const char *string, bool bMultiline=true) const;
 
 private:
 	hgeFont();

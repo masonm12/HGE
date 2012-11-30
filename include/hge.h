@@ -1,5 +1,5 @@
 /*
-** Haaf's Game Engine 1.7
+** Haaf's Game Engine 1.8
 ** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
@@ -13,7 +13,7 @@
 
 #include <windows.h>
 
-#define HGE_VERSION 0x170
+#define HGE_VERSION 0x180
 
 #ifdef HGEDLL
 #define EXPORT  __declspec(dllexport)
@@ -104,62 +104,64 @@ typedef DWORD HCHANNEL;
 */
 enum hgeBoolState
 {
-	HGE_WINDOWED		= 12,   // bool		run in window?		(default: false)
-	HGE_ZBUFFER			= 13,   // bool		use z-buffer?		(default: false)
-	HGE_TEXTUREFILTER	= 28,   // bool		texture filtering?	(default: true)
+	HGE_WINDOWED		= 1,    // bool		run in window?		(default: false)
+	HGE_ZBUFFER			= 2,    // bool		use z-buffer?		(default: false)
+	HGE_TEXTUREFILTER	= 3,    // bool		texture filtering?	(default: true)
 	
-	HGE_USESOUND		= 18,   // bool		use BASS for sound?	(default: true)
+	HGE_USESOUND		= 4,    // bool		use BASS for sound?	(default: true)
 	
-	HGE_DONTSUSPEND		= 24,	// bool		focus lost:suspend?	(default: false)
-	HGE_HIDEMOUSE		= 25,	// bool		hide system cursor?	(default: true)
+	HGE_DONTSUSPEND		= 5,	// bool		focus lost:suspend?	(default: false)
+	HGE_HIDEMOUSE		= 6,	// bool		hide system cursor?	(default: true)
 
-	HGE_SHOWSPLASH		= 27,	// bool		hide system cursor?	(default: true)
+	HGE_SHOWSPLASH		= 7,	// bool		hide system cursor?	(default: true)
 
 	HGEBOOLSTATE_FORCE_DWORD = 0x7FFFFFFF
 };
 
 enum hgeFuncState
 {
-	HGE_FRAMEFUNC		= 1,    // bool*()	frame function		(default: NULL) (you MUST set this)
-	HGE_RENDERFUNC		= 2,    // bool*()	render function		(default: NULL)
-	HGE_FOCUSLOSTFUNC	= 3,    // bool*()	focus lost function	(default: NULL)
-	HGE_FOCUSGAINFUNC	= 4,    // bool*()	focus gain function	(default: NULL)
-	HGE_GFXRESTOREFUNC	= 5,    // bool*()	exit function		(default: NULL)
-	HGE_EXITFUNC		= 6,    // bool*()	exit function		(default: NULL)
+	HGE_FRAMEFUNC		= 8,    // bool*()	frame function		(default: NULL) (you MUST set this)
+	HGE_RENDERFUNC		= 9,    // bool*()	render function		(default: NULL)
+	HGE_FOCUSLOSTFUNC	= 10,   // bool*()	focus lost function	(default: NULL)
+	HGE_FOCUSGAINFUNC	= 11,   // bool*()	focus gain function	(default: NULL)
+	HGE_GFXRESTOREFUNC	= 12,   // bool*()	exit function		(default: NULL)
+	HGE_EXITFUNC		= 13,   // bool*()	exit function		(default: NULL)
 	
 	HGEFUNCSTATE_FORCE_DWORD = 0x7FFFFFFF
 };
 
 enum hgeHwndState
 {
-	HGE_HWND			= 26,	// int		window handle: read only
-	HGE_HWNDPARENT		= 27,	// int		parent win handle	(default: 0)
+	HGE_HWND			= 15,	// int		window handle: read only
+	HGE_HWNDPARENT		= 16,	// int		parent win handle	(default: 0)
 	
 	HGEHWNDSTATE_FORCE_DWORD = 0x7FFFFFFF
 };
 
 enum hgeIntState
 {
-	HGE_SCREENWIDTH		= 9,    // int		screen width		(default: 800)
-	HGE_SCREENHEIGHT	= 10,   // int		screen height		(default: 600)
-	HGE_SCREENBPP		= 11,   // int		screen bitdepth		(default: 32) (desktop bpp in windowed mode)
+	HGE_SCREENWIDTH		= 17,   // int		screen width		(default: 800)
+	HGE_SCREENHEIGHT	= 18,   // int		screen height		(default: 600)
+	HGE_SCREENBPP		= 19,   // int		screen bitdepth		(default: 32) (desktop bpp in windowed mode)
 	
-	HGE_SAMPLERATE		= 19,   // int		sample rate			(default: 44100)
-	HGE_FXVOLUME		= 20,   // int		global fx volume	(default: 100)
-	HGE_MUSVOLUME		= 21,   // int		global music volume	(default: 100)
+	HGE_SAMPLERATE		= 20,   // int		sample rate			(default: 44100)
+	HGE_FXVOLUME		= 21,   // int		global fx volume	(default: 100)
+	HGE_MUSVOLUME		= 22,   // int		global music volume	(default: 100)
 	
 	HGE_FPS				= 23,	// int		fixed fps			(default: HGEFPS_UNLIMITED)
+
+	HGE_POWERSTATUS		= 24,   // int		battery life percent + status
 	
 	HGEINTSTATE_FORCE_DWORD = 0x7FFFFFF
 };
 
 enum hgeStringState
 {
-	HGE_ICON			= 7,    // char*	icon resource		(default: NULL)
-	HGE_TITLE			= 8,    // char*	window title		(default: "HGE")
+	HGE_ICON			= 25,   // char*	icon resource		(default: NULL)
+	HGE_TITLE			= 26,   // char*	window title		(default: "HGE")
 	
-	HGE_INIFILE			= 15,   // char*	ini file			(default: NULL) (meaning no file)
-	HGE_LOGFILE			= 16,   // char*	log file			(default: NULL) (meaning no file)
+	HGE_INIFILE			= 27,   // char*	ini file			(default: NULL) (meaning no file)
+	HGE_LOGFILE			= 28,   // char*	log file			(default: NULL) (meaning no file)
 
 	HGESTRINGSTATE_FORCE_DWORD = 0x7FFFFFFF
 };
@@ -175,6 +177,13 @@ typedef bool (*hgeCallback)();
 */
 #define HGEFPS_UNLIMITED	0
 #define HGEFPS_VSYNC		-1
+
+
+/*
+** HGE_POWERSTATUS system state special constants
+*/
+#define HGEPWR_AC			-1
+#define HGEPWR_UNSUPPORTED	-2
 
 
 /*

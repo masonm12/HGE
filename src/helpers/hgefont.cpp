@@ -143,8 +143,8 @@ void hgeFont::Render(float x, float y, int align, const char *string)
 	float	fx=x;
 
 	align &= HGETEXT_HORZMASK;
-	if(align==HGETEXT_RIGHT) fx-=GetStringWidth(string);
-	if(align==HGETEXT_CENTER) fx-=int(GetStringWidth(string)/2.0f);
+	if(align==HGETEXT_RIGHT) fx-=GetStringWidth(string, false);
+	if(align==HGETEXT_CENTER) fx-=int(GetStringWidth(string, false)/2.0f);
 
 	while(*string)
 	{
@@ -152,8 +152,8 @@ void hgeFont::Render(float x, float y, int align, const char *string)
 		{
 			y += int(fHeight*fScale*fSpacing);
 			fx = x;
-			if(align == HGETEXT_RIGHT)  fx -= GetStringWidth(string+1);
-			if(align == HGETEXT_CENTER) fx -= int(GetStringWidth(string+1)/2.0f);
+			if(align == HGETEXT_RIGHT)  fx -= GetStringWidth(string+1, false);
+			if(align == HGETEXT_CENTER) fx -= int(GetStringWidth(string+1, false)/2.0f);
 		}
 		else
 		{
@@ -258,7 +258,7 @@ void hgeFont::printfb(float x, float y, float w, float h, int align, const char 
 	Render(tx,ty,align,buffer);
 }
 
-float hgeFont::GetStringWidth(const char *string) const
+float hgeFont::GetStringWidth(const char *string, bool bMultiline) const
 {
 	int i;
 	float linew, w = 0;
@@ -276,6 +276,8 @@ float hgeFont::GetStringWidth(const char *string) const
 
 			string++;
 		}
+
+		if(!bMultiline) return linew*fScale*fProportion;
 
 		if(linew > w) w = linew;
 

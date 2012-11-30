@@ -324,6 +324,17 @@ this state must be set before call to <a href="hgefunc_systeminitiate.html">Syst
 </tr>
 <tr><td colspan=4><img src="1.gif" width=1 height=7></td></tr>
 
+<tr>
+<td valign=top><a name=HGE_POWERSTATUS></a><b>HGE_POWERSTATUS</b></td>
+<td valign=top>int</td><td valign=top>n/a</td>
+<td>
+Read only. If the current power source is AC, returns <b>HGEPWR_AC</b>.
+Otherwise returns the current battery level, 0-100. If power status is unsupported,
+returns <b>HGEPWR_UNSUPPORTED</b>. See <a href="main_power.html">Power Management</a> for details.
+</td>
+</tr>
+<tr><td colspan=4><img src="1.gif" width=1 height=7></td></tr>
+
 </table>
 </p>
 <h2>Requirements</h2>

@@ -102,13 +102,15 @@ public:
 	void				Update(float fDeltaTime);
 	void				MoveTo(float x, float y, bool bMoveParticles=false);
 	void				Transpose(float x, float y) { fTx=x; fTy=y; }
+	void				SetScale(float scale) { fScale = scale; }
 	void				TrackBoundingBox(bool bTrack) { bUpdateBoundingBox=bTrack; }
 
 	int					GetParticlesAlive() const { return nParticlesAlive; }
 	float				GetAge() const { return fAge; }
 	void				GetPosition(float *x, float *y) const { *x=vecLocation.x; *y=vecLocation.y; }
 	void				GetTransposition(float *x, float *y) const { *x=fTx; *y=fTy; }
-	hgeRect*			GetBoundingBox(hgeRect *rect) const { memcpy(rect, &rectBoundingBox, sizeof(hgeRect)); return rect; }
+	float				GetScale() { return fScale; }
+	hgeRect*			GetBoundingBox(hgeRect *rect) const;
 
 private:
 	hgeParticleSystem();
@@ -121,6 +123,7 @@ private:
 	hgeVector			vecPrevLocation;
 	hgeVector			vecLocation;
 	float				fTx, fTy;
+	float				fScale;
 
 	int					nParticlesAlive;
 	hgeRect				rectBoundingBox;

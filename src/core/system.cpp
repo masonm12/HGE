@@ -1,5 +1,5 @@
 /*
-** Haaf's Game Engine 1.7
+** Haaf's Game Engine 1.8
 ** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
@@ -87,6 +87,7 @@ bool CALL HGE_Impl::System_Initiate()
 	GlobalMemoryStatus(&mem_st);
 	System_Log("Memory: %ldK total, %ldK free\n",mem_st.dwTotalPhys/1024L,mem_st.dwAvailPhys/1024L);
 
+
 	// Register window class
 	
 	winclass.style = CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
@@ -153,6 +154,7 @@ bool CALL HGE_Impl::System_Initiate()
 
 	timeBeginPeriod(1);
 	Random_Seed();
+	_InitPowerStatus();
 	_InputInit();
 	if(!_GfxInit()) { System_Shutdown(); return false; }
 	if(!_SoundInit()) { System_Shutdown(); return false; }
@@ -200,9 +202,11 @@ void CALL HGE_Impl::System_Shutdown()
 	System_Log("\nFinishing..");
 
 	timeEndPeriod(1);
+	if(hSearch) { FindClose(hSearch); hSearch=0; }
 	_ClearQueue();
 	_SoundDone();
 	_GfxDone();
+	_DonePowerStatus();
 
 	if(hwnd)
 	{
@@ -294,7 +298,11 @@ bool CALL HGE_Impl::System_Start()
 
 				t0=timeGetTime();
 				if(t0-t0fps <= 1000) cfps++;
-				else {nFPS=cfps; cfps=0; t0fps=t0;}
+				else
+				{
+					nFPS=cfps; cfps=0; t0fps=t0;
+					_UpdatePowerStatus();
+				}
 
 				// Do user's stuff
 
@@ -552,6 +560,7 @@ int CALL HGE_Impl::System_GetStateInt(hgeIntState state)
 		case HGE_FXVOLUME:		return nFXVolume;
 		case HGE_MUSVOLUME:		return nMusVolume;
 		case HGE_FPS:			return nHGEFPS;
+		case HGE_POWERSTATUS:	return nPowerStatus;
 	}
 
 	return 0;
@@ -692,6 +701,10 @@ HGE_Impl::HGE_Impl()
 	bDontSuspend=false;
 	hwndParent=0;
 
+	nPowerStatus=HGEPWR_UNSUPPORTED;
+	hKrnl32 = NULL;
+	lpfnGetSystemPowerStatus = NULL;
+
 #ifdef DEMO
 	bDMO=true;
 #endif
@@ -725,22 +738,34 @@ void HGE_Impl::_FocusChange(bool bAct)
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
+	bool bActivating;
+
 	switch(msg)
 	{	
 		case WM_CREATE: 
 			return FALSE;
 		
 		case WM_PAINT:
-			if(pHGE->procRenderFunc) pHGE->procRenderFunc();
+			if(pHGE->pD3D && pHGE->procRenderFunc && pHGE->bWindowed) pHGE->procRenderFunc();
 			break;
 
 		case WM_DESTROY:
 			PostQuitMessage(0);
 			return FALSE;
 
+/*
 		case WM_ACTIVATEAPP:
-			if(pHGE->pD3D && pHGE->bActive != (wparam == TRUE)) pHGE->_FocusChange(wparam == TRUE);
+			bActivating = (wparam == TRUE);
+			if(pHGE->pD3D && pHGE->bActive != bActivating) pHGE->_FocusChange(bActivating);
 			return FALSE;
+*/
+		case WM_ACTIVATE:
+			// tricky: we should catch WA_ACTIVE and WA_CLICKACTIVE,
+			// but only if HIWORD(wParam) (fMinimized) == FALSE (0)
+			bActivating = (LOWORD(wparam) != WA_INACTIVE) && (HIWORD(wparam) == 0);
+			if(pHGE->pD3D && pHGE->bActive != bActivating) pHGE->_FocusChange(bActivating);
+			return FALSE;
+
 
 		case WM_SETCURSOR:
 			if(pHGE->bActive && LOWORD(lparam)==HTCLIENT && pHGE->bHideMouse) SetCursor(NULL);
@@ -815,7 +840,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 			return FALSE;
 
 		case WM_SIZE:
-			if(wparam==SIZE_RESTORED) pHGE->_Resize(LOWORD(lparam), HIWORD(lparam));
+			if(pHGE->pD3D && wparam==SIZE_RESTORED) pHGE->_Resize(LOWORD(lparam), HIWORD(lparam));
 			//return FALSE;
 			break;
 

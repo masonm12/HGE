@@ -1,5 +1,5 @@
 /*
-** Haaf's Game Engine 1.7
+** Haaf's Game Engine 1.8
 ** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
@@ -102,12 +102,26 @@ void CALL HGE_Impl::Gfx_SetTransform(float x, float y, float dx, float dy, float
 bool CALL HGE_Impl::Gfx_BeginScene(HTARGET targ)
 {
 	LPDIRECT3DSURFACE8 pSurf=0, pDepth=0;
+	D3DDISPLAYMODE Mode;
 	CRenderTargetList *target=(CRenderTargetList *)targ;
 
 	HRESULT hr = pD3DDevice->TestCooperativeLevel();
 	if (hr == D3DERR_DEVICELOST) return false;
 	else if (hr == D3DERR_DEVICENOTRESET)
 	{
+		if(bWindowed)
+		{
+			if(FAILED(pD3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &Mode)) || Mode.Format==D3DFMT_UNKNOWN) 
+			{
+				_PostError("Can't determine desktop video mode");
+				return false;
+			}
+
+			d3dppW.BackBufferFormat = Mode.Format;
+			if(_format_id(Mode.Format) < 4) nScreenBPP=16;
+			else nScreenBPP=32;
+		}
+
 	    if(!_GfxRestore()) return false; 
 	}
     
@@ -405,11 +419,11 @@ HTEXTURE CALL HGE_Impl::Texture_Load(const char *filename, DWORD size, bool bMip
 
 	{	
 		_PostError("Can't create texture");
-		if(!size) delete data;
+		if(!size) Resource_Free(data);
 		return NULL;
 	}
 
-	if(!size) delete data;
+	if(!size) Resource_Free(data);
 	
 	texItem=new CTextureList;
 	texItem->tex=(HTEXTURE)pTex;

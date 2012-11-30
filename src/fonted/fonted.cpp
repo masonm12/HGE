@@ -1,5 +1,5 @@
 /*
-** Haaf's Game Engine 1.6
+** Haaf's Game Engine 1.8
 ** Copyright (C) 2003, Relish Games
 ** hge.relishgames.com
 **

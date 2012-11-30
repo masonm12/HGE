@@ -28,6 +28,7 @@ hgeParticleSystem::hgeParticleSystem(const char *filename, hgeSprite *sprite)
 	vecLocation.x=vecPrevLocation.x=0.0f;
 	vecLocation.y=vecPrevLocation.y=0.0f;
 	fTx=fTy=0;
+	fScale = 1.0f;
 
 	fEmissionResidue=0.0f;
 	nParticlesAlive=0;
@@ -46,6 +47,7 @@ hgeParticleSystem::hgeParticleSystem(hgeParticleSystemInfo *psi)
 	vecLocation.x=vecPrevLocation.x=0.0f;
 	vecLocation.y=vecPrevLocation.y=0.0f;
 	fTx=fTy=0;
+	fScale = 1.0f;
 
 	fEmissionResidue=0.0f;
 	nParticlesAlive=0;
@@ -236,9 +238,22 @@ void hgeParticleSystem::Render()
 	for(i=0; i<nParticlesAlive; i++)
 	{
 		info.sprite->SetColor(par->colColor.GetHWColor());
-		info.sprite->RenderEx(par->vecLocation.x+fTx, par->vecLocation.y+fTy, par->fSpin*par->fAge, par->fSize);
+		info.sprite->RenderEx(par->vecLocation.x*fScale+fTx, par->vecLocation.y*fScale+fTy, par->fSpin*par->fAge, par->fSize*fScale);
 		par++;
 	}
 
 	info.sprite->SetColor(col);
+}
+
+
+hgeRect *hgeParticleSystem::GetBoundingBox(hgeRect *rect) const
+{
+	*rect = rectBoundingBox;
+
+	rect->x1 *= fScale;
+	rect->y1 *= fScale;
+	rect->x2 *= fScale;
+	rect->y2 *= fScale;
+
+	return rect;
 }

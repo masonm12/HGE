@@ -1,5 +1,5 @@
 /*
-** Haaf's Game Engine 1.7
+** Haaf's Game Engine 1.8
 ** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
@@ -19,6 +19,9 @@
 
 #define D3DFVF_HGEVERTEX (D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1)
 #define VERTEX_BUFFER_SIZE 4000
+
+
+typedef BOOL (WINAPI *GetSystemPowerStatusFunc)(LPSYSTEM_POWER_STATUS);
 
 
 struct CRenderTargetList
@@ -193,6 +196,7 @@ public:
 	void				_FocusChange(bool bAct);
 	void				_PostError(char *error);
 
+
 	HINSTANCE			hInstance;
 	HWND				hwnd;
 
@@ -231,6 +235,16 @@ public:
 	#ifdef DEMO
 	bool				bDMO;
 	#endif
+
+
+	// Power
+	int							nPowerStatus;
+	HMODULE						hKrnl32;
+	GetSystemPowerStatusFunc	lpfnGetSystemPowerStatus;
+
+	void				_InitPowerStatus();
+	void				_UpdatePowerStatus();
+	void				_DonePowerStatus();
 
 
 	// Graphics
@@ -303,7 +317,7 @@ public:
 	void				_BuildEvent(int type, int key, int scan, int flags, int x, int y);
 
 
-	// Resource
+	// Resources
 	char				szTmpFilename[_MAX_PATH];
 	CResourceList*		res;
 	HANDLE				hSearch;

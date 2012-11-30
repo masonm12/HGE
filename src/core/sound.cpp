@@ -1,5 +1,5 @@
 /*
-** Haaf's Game Engine 1.7
+** Haaf's Game Engine 1.8
 ** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
@@ -43,7 +43,7 @@ HEFFECT CALL HGE_Impl::Effect_Load(const char *filename, DWORD size)
 				BASS_ChannelGetInfo(hstrm, &info);
 				samples=length;
 				if(info.chans < 2) samples>>=1;
-				if(info.flags & BASS_SAMPLE_8BITS == 0) samples>>=1;
+				if((info.flags & BASS_SAMPLE_8BITS) == 0) samples>>=1;
 				buffer=BASS_SampleCreate(samples, info.freq, 2, 4, info.flags | BASS_SAMPLE_OVER_VOL);
 				if(!buffer)
 				{
@@ -456,6 +456,7 @@ bool HGE_Impl::_SoundInit()
 	LOADBASSFUNCTION(BASS_Pause);
 	LOADBASSFUNCTION(BASS_Stop);
 	LOADBASSFUNCTION(BASS_SetConfig);
+	//LOADBASSFUNCTION(BASS_ErrorGetCode);
 
 	LOADBASSFUNCTION(BASS_SampleLoad);
 	LOADBASSFUNCTION(BASS_SampleCreate);
@@ -521,6 +522,9 @@ void HGE_Impl::_SoundDone()
 	{
 		BASS_Stop();
 		BASS_Free();
+
+		//int err = BASS_ErrorGetCode(); 
+
 		FreeLibrary(hBass);
 		hBass=0;
 

@@ -22,13 +22,17 @@ Returns the on-screen string width.
 </p>
 <pre>
 float GetStringWidth(
-  const char *<i><b>string</b></i>
+  const char *<i><b>string</b></i>,
+  bool <i><b>bMultiline</b></i> = true
 );
 </pre>
 <h2>Parameters</h2>
 <dl>
 <dt><i>string</i>
 <dd>Pointer to a string which width is to be calculated.
+<dt><i>bMultiline</i>
+<dd>If the specified string contains line breaks and this parameter is <b>true</b>,
+the width of the longest line is returned. If <b>false</b> the width of the first line is returned.
 </dl>
 <h2>Return value</h2>
 <p>

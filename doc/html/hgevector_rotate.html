@@ -16,24 +16,30 @@
 
 <td valign=top>
 <table width=566 cellspacing=0 cellpadding=20 border=0><tr><td>
-<h1 style="margin-top:0px">hgeVector::Clamp</h1>
+<h1 style="margin-top:0px">hgeVector::Rotate</h1>
 <p>
-Limits the vector to a specified length.
+Rotates the vector to the specified angle.
 </p>
 <pre>
-void Clamp(
-  float <i><b>maxlength</b></i>
+hgeVector *Rotate(
+  float <i><b>angle</b></i>
 );
 </pre>
 <h2>Parameters</h2>
 <dl>
-<dt><i>maxlength</i>
-<dd>The maximum allowed length of the vector.
+
+<dt><i>angle</i>
+<dd>Angle in radians to rotate the vector to.
 </dl>
+<h2>Return value</h2>
+<p>
+Returns pointer to the rotated vector.
+</p>
 <h2>Requirements</h2>
 <p>
 <b>Header:</b> hgevector.h<br>
 <b>Import library:</b> hgehelp.lib<br>
+
 </p>
 <br>
 </td></tr></table>
