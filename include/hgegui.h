@@ -118,8 +118,8 @@ private:
 
 	float			mx,my;
 	int				nWheel;
-	bool			bLPressed, bLLastPressed;
-	bool			bRPressed, bRLastPressed;
+	bool			bLPressed, bLReleased;
+	bool			bRPressed, bRReleased;
 };
 
 

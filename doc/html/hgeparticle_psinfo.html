@@ -146,6 +146,9 @@ random variation from <b>fSpinStart</b> to <b>fSpinEnd</b>).
 <dl>
 <dt>colColorStart
 <dd>The starting color and opacity for a specific particle. See <a href="hgecolor__main.html">hgeColor</a> class for details.
+<br>
+If <b>colColorStart.r == -1</b> a special coloring mode is turned on: the particle system stops altering RGB of it's sprite
+and uses the color already set in it (the same for all particles). Only the alpha component is changed for each particle.
 <dt>colColorEnd
 <dd>The ending color and opacity for a specific particle. See <a href="hgecolor__main.html">hgeColor</a> class for details.
 <dt>fColorVar

@@ -23,8 +23,8 @@ hgeGUI::hgeGUI()
 	ctrlFocus=0;
 	ctrlOver=0;
 	navmode=HGEGUI_NONAVKEYS;
-	bLPressed=bLLastPressed=false;
-	bRPressed=bRLastPressed=false;
+	bLPressed=bLReleased=false;
+	bRPressed=bRReleased=false;
 	nWheel=0;
 	mx=my=0.0f;
 	nEnterLeave=0;
@@ -148,6 +148,10 @@ void hgeGUI::Reset()
 		ctrl->Reset();
 		ctrl=ctrl->next;
 	}
+
+	ctrlLock=0;
+	ctrlOver=0;
+	ctrlFocus=0;
 }
 
 
@@ -242,10 +246,10 @@ int hgeGUI::Update(float dt)
 // Update the mouse variables
 
 	hge->Input_GetMousePos(&mx, &my);
-	bLLastPressed=bLPressed;
-	bLPressed=hge->Input_GetKeyState(VK_LBUTTON);
-	bRLastPressed=bRPressed;
-	bRPressed=hge->Input_GetKeyState(VK_RBUTTON);
+	bLPressed  = hge->Input_KeyDown(HGEK_LBUTTON);
+	bLReleased = hge->Input_KeyUp(HGEK_LBUTTON);
+	bRPressed  = hge->Input_KeyDown(HGEK_RBUTTON);
+	bRReleased = hge->Input_KeyUp(HGEK_RBUTTON);
 	nWheel=hge->Input_GetMouseWheel();
 
 // Update all controls
@@ -334,10 +338,13 @@ int hgeGUI::Update(float dt)
 
 // Handle mouse
 
+	bool bLDown = hge->Input_GetKeyState(HGEK_LBUTTON);
+	bool bRDown = hge->Input_GetKeyState(HGEK_RBUTTON);
+
 	if(ctrlLock)
 	{
 		ctrl=ctrlLock;
-		if(!bLPressed && !bRPressed) ctrlLock=0;
+		if(!bLDown && !bRDown) ctrlLock=0;
 		if(ProcessCtrl(ctrl)) return ctrl->id;
 	}
 	else
@@ -376,11 +383,11 @@ bool hgeGUI::ProcessCtrl(hgeGUIObject *ctrl)
 {
 	bool bResult=false;
 
-	if(!bLLastPressed && bLPressed)	{ ctrlLock=ctrl;SetFocus(ctrl->id);bResult=bResult || ctrl->MouseLButton(true); }
-	if(!bRLastPressed && bRPressed)	{ ctrlLock=ctrl;SetFocus(ctrl->id);bResult=bResult || ctrl->MouseRButton(true); }
-	if(bLLastPressed && !bLPressed)	{ bResult=bResult || ctrl->MouseLButton(false); }
-	if(bRLastPressed && !bRPressed)	{ bResult=bResult || ctrl->MouseRButton(false); }
-	if(nWheel) bResult=bResult || ctrl->MouseWheel(nWheel);
+	if(bLPressed)	{ ctrlLock=ctrl;SetFocus(ctrl->id);bResult=bResult || ctrl->MouseLButton(true); }
+	if(bRPressed)	{ ctrlLock=ctrl;SetFocus(ctrl->id);bResult=bResult || ctrl->MouseRButton(true); }
+	if(bLReleased)	{ bResult=bResult || ctrl->MouseLButton(false); }
+	if(bRReleased)	{ bResult=bResult || ctrl->MouseRButton(false); }
+	if(nWheel)		{ bResult=bResult || ctrl->MouseWheel(nWheel); }
 	bResult=bResult || ctrl->MouseMove(mx-ctrl->rect.x1,my-ctrl->rect.y1);
 
 	return bResult;

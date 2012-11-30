@@ -192,6 +192,10 @@ void InitEditor()
 
 	state.FontFamily=FontList->GetFontByIdx(0);
 	state.nSize=20;
+	state.nPadTop=hge->Ini_GetInt("HGE", "PaddingTop",0);
+	state.nPadBtm=hge->Ini_GetInt("HGE", "PaddingBottom",0);
+	state.nPadLft=hge->Ini_GetInt("HGE", "PaddingLeft",0);
+	state.nPadRgt=hge->Ini_GetInt("HGE", "PaddingRight",0);
 	state.bBold=false;
 	state.bItalic=false;
 	state.bAntialias=true;

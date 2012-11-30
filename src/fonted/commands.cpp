@@ -86,7 +86,7 @@ void cmdGenerateFont()
 {
 	if(sprFont) delete sprFont;
 	if(texFont) hge->Texture_Free(texFont);
-	texFont=FontGenerate(state.FontFamily, state.nSize, state.bBold, state.bItalic, state.bAntialias, &state.sr, 1);
+	texFont=FontGenerate(state.FontFamily, state.nSize, state.nPadTop, state.nPadBtm, state.nPadLft, state.nPadRgt, state.bBold, state.bItalic, state.bAntialias, &state.sr, 1);
 	sprFont=new hgeSprite(texFont, 0.0f, 0.0f, (float)hge->Texture_GetWidth(texFont), (float)hge->Texture_GetHeight(texFont));
 }
 

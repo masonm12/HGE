@@ -227,6 +227,7 @@ public:
 	int					nSampleRate;
 	int					nFXVolume;
 	int					nMusVolume;
+	int					nStreamVolume;
 	int					nHGEFPS;
 	bool				bHideMouse;
 	bool				bDontSuspend;
@@ -298,6 +299,7 @@ public:
 	bool				_SoundInit();
 	void				_SoundDone();
 	void				_SetMusVolume(int vol);
+	void				_SetStreamVolume(int vol);
 	void				_SetFXVolume(int vol);
 
 

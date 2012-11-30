@@ -658,7 +658,7 @@ DWORD RSprite::Get(hgeResourceManager *rm)
 	hgeSprite *spr;
 	if(!handle)
 	{
-		spr = new hgeSprite(rm->GetTexture(texname), tx, ty, w, h);
+		spr = new hgeSprite(rm->GetTexture(texname, resgroup), tx, ty, w, h);
 		spr->SetColor(color);
 		spr->SetZ(z);
 		spr->SetBlendMode(blend);
@@ -722,7 +722,7 @@ DWORD RAnimation::Get(hgeResourceManager *rm)
 	hgeAnimation *spr;
 	if(!handle)
 	{
-		spr = new hgeAnimation(rm->GetTexture(texname), frames, fps, tx, ty, w, h);
+		spr = new hgeAnimation(rm->GetTexture(texname, resgroup), frames, fps, tx, ty, w, h);
 		spr->SetColor(color);
 		spr->SetZ(z);
 		spr->SetBlendMode(blend);
@@ -1009,7 +1009,7 @@ DWORD RDistort::Get(hgeResourceManager *rm)
 	if(!handle)
 	{
 		dis = new hgeDistortionMesh(cols, rows);
-		dis->SetTexture(rm->GetTexture(texname));
+		dis->SetTexture(rm->GetTexture(texname, resgroup));
 		dis->SetTextureRect(tx,ty,w,h);
 		dis->SetBlendMode(blend);
 		dis->Clear(color,z);

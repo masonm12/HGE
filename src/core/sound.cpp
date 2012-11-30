@@ -510,6 +510,7 @@ bool HGE_Impl::_SoundInit()
 
 	_SetFXVolume(nFXVolume);
 	_SetMusVolume(nMusVolume);
+	_SetStreamVolume(nStreamVolume);
 
 	return true;
 }
@@ -542,6 +543,11 @@ void HGE_Impl::_SoundDone()
 void HGE_Impl::_SetMusVolume(int vol)
 {
 	if(hBass) BASS_SetConfig(BASS_CONFIG_GVOL_MUSIC, vol);
+}
+
+void HGE_Impl::_SetStreamVolume(int vol)
+{
+	if(hBass) BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, vol);
 }
 
 void HGE_Impl::_SetFXVolume(int vol)

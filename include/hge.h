@@ -147,21 +147,22 @@ enum hgeIntState
 	HGE_SAMPLERATE		= 20,   // int		sample rate			(default: 44100)
 	HGE_FXVOLUME		= 21,   // int		global fx volume	(default: 100)
 	HGE_MUSVOLUME		= 22,   // int		global music volume	(default: 100)
+	HGE_STREAMVOLUME	= 23,   // int		global music volume	(default: 100)
 	
-	HGE_FPS				= 23,	// int		fixed fps			(default: HGEFPS_UNLIMITED)
+	HGE_FPS				= 24,	// int		fixed fps			(default: HGEFPS_UNLIMITED)
 
-	HGE_POWERSTATUS		= 24,   // int		battery life percent + status
+	HGE_POWERSTATUS		= 25,   // int		battery life percent + status
 	
 	HGEINTSTATE_FORCE_DWORD = 0x7FFFFFF
 };
 
 enum hgeStringState
 {
-	HGE_ICON			= 25,   // char*	icon resource		(default: NULL)
-	HGE_TITLE			= 26,   // char*	window title		(default: "HGE")
+	HGE_ICON			= 26,   // char*	icon resource		(default: NULL)
+	HGE_TITLE			= 27,   // char*	window title		(default: "HGE")
 	
-	HGE_INIFILE			= 27,   // char*	ini file			(default: NULL) (meaning no file)
-	HGE_LOGFILE			= 28,   // char*	log file			(default: NULL) (meaning no file)
+	HGE_INIFILE			= 28,   // char*	ini file			(default: NULL) (meaning no file)
+	HGE_LOGFILE			= 29,   // char*	log file			(default: NULL) (meaning no file)
 
 	HGESTRINGSTATE_FORCE_DWORD = 0x7FFFFFFF
 };

@@ -22,13 +22,16 @@ Returns handle to a named texture.
 </p>
 <pre>
 HTEXTURE GetTexture(
-  const char *<i><b>name</b></i>
+  const char *<i><b>name</b></i>,
+  int <i><b>resgroup</b></i> = 0
 );
 </pre>
 <h2>Parameters</h2>
 <dl>
 <dt><i>name</i>
 <dd>Texture name.
+<dt><i>resgroup</i>
+<dd>Resource group identificator.
 </dl>
 <h2>Return value</h2>
 <p>
@@ -41,6 +44,11 @@ either absolute or relative to the application folder or resource package root.
 <br><br>
 If the texture hasn't been loaded yet, it will be loaded.
 Otherwise handle to the existing texture will be returned.
+<br><br>
+The <b>resgroup</b> parameter is only used if you specify plain file name.
+When loading resources defined in resource script, <b>resgroup</b> is taken from the script.
+Use the value passed here with <a href="hgeresource_purge.html">Purge</a>
+to free the resource. If =0 or omitted - no specific group will be assigned to the recource.
 </p>
 <h2>Requirements</h2>
 <p>

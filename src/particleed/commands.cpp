@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2007, Relish Games
+** Haaf's Game Engine 1.81
+** Copyright (C) 2008, Relish Games
 ** hge.relishgames.com
 **
 ** Particle systems editor

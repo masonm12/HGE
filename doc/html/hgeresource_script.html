@@ -83,6 +83,7 @@ All the parsing errors are written to the log file in the most meaningful way po
 <a href="#font">Font</a><br>
 <a href="#particle">Particle</a><br>
 <a href="#distortion">Distortion</a><br>
+<a href="#stringtable">StringTable</a><br>
 </td>
 </tr>
 </table>
@@ -423,6 +424,27 @@ Distortion waves
  rect=0,0,400,200
  mesh=16,8
  color=FF2060F0
+ resgroup=1
+}
+</pre>
+<a name="stringtable"></a>
+<h2>StringTable</h2>
+<p>
+Command "StringTable" defines a string table. Supported parameters:
+</p>
+<dl>
+<dt>filename
+<dd>The string table filename, either absolute or relative to the application folder or resource package root.
+<dt>resgroup
+<dd>Integer resource group identificator. Default is 0, meaning no specific group.
+</dl>
+<p>
+Example:
+</p>
+<pre>
+StringTable dialogs
+{
+ filename=strings\dialogs.txt
  resgroup=1
 }
 </pre>

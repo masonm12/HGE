@@ -450,6 +450,10 @@ void CALL HGE_Impl::System_SetStateInt(hgeIntState state, int value)
 								_SetMusVolume(nMusVolume);
 								break;
 
+		case HGE_STREAMVOLUME:	nStreamVolume=value;
+								_SetStreamVolume(nStreamVolume);
+								break;
+
 		case HGE_FPS:			if(VertArray) break;
 
 								if(pD3DDevice)
@@ -559,6 +563,7 @@ int CALL HGE_Impl::System_GetStateInt(hgeIntState state)
 		case HGE_SAMPLERATE:	return nSampleRate;
 		case HGE_FXVOLUME:		return nFXVolume;
 		case HGE_MUSVOLUME:		return nMusVolume;
+		case HGE_STREAMVOLUME:	return nStreamVolume;
 		case HGE_FPS:			return nHGEFPS;
 		case HGE_POWERSTATUS:	return nPowerStatus;
 	}
@@ -696,6 +701,7 @@ HGE_Impl::HGE_Impl()
 	nSampleRate=44100;
 	nFXVolume=100;
 	nMusVolume=100;
+	nStreamVolume=100;
 	nFixedDelta=0;
 	bHideMouse=true;
 	bDontSuspend=false;

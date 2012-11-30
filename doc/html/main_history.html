@@ -17,6 +17,27 @@
 <td valign=top>
 <table width=566 cellspacing=0 cellpadding=20 border=0><tr><td>
 <h1 style="margin-top:0px">Version history</h1>
+
+
+<h2>Version 1.81, 12 March 2008</h2>
+<ul>
+<li><a href="texasm__main.html">Texture Assembler</a> tool was added
+<li>Missing files were added, including <b>power.cpp</b> and some documentation
+<li><a href="hgeconst_systemstate.html#HGE_STREAMVOLUME">HGE_STREAMVOLUME</a> system state was added
+<li><a href="fbuilder__main.html">Font Builder</a> now supports character padding via <a href="fbuilder_ini.html">INI-file</a>
+<li>Fixed a bug in <a href="hgecolorhsv_sethwcolor.html">hgeColorHSV::SetHWColor</a>
+<li>Several minor bugfixes in <a href="hgegui__main.html">hgeGUI</a>
+<li>Several minor bugfixes in <a href="hgegui_guilistbox.html">hgeGUIListbox</a>
+<li>A special coloring mode was added to <a href="hgeparticle__main.html">hgeParticleSystem</a>. See description of <b>colColorStart</b> in <a href="hgeparticle_psinfo.html">hgeParticleSystemInfo</a> structure
+<li><a href="hgeresource__main.html">hgeResourceManager</a>: If a texture is specified directly by filename in <a href="hgeresource_script.html#sprite">Sprite</a>,
+<a href="hgeresource_script.html#animation">Animation</a> or <a href="hgeresource_script.html#distortion">Distortion</a> resource, it now inherits that resource's <b>resgroup</b>
+<li><a href="hgeresource__main.html">hgeResourceManager</a>: You may now specify <b>resgroup</b> for resources loaded directly by filename with
+<a href="hgeresource_getresource.html">GetResource</a>, <a href="hgeresource_gettexture.html">GetTexture</a>, <a href="hgeresource_geteffect.html">GetEffect</a>,
+<a href="hgeresource_getmusic.html">GetMusic</a>, <a href="hgeresource_getstream.html">GetStream</a> and <a href="hgeresource_getstringtable.html">GetStringTable</a> functions
+<li><a href="hgeresource__main.html">hgeResourceManager</a>: Added documentation on <a href="hgeresource_script.html#stringtable">StringTable</a> resource syntax
+</ul>
+
+
 <h2>Version 1.8, 12 October 2007</h2>
 <ul>
 <li><a href="hgeconst_systemstate.html#HGE_POWERSTATUS">HGE_POWERSTATUS</a> system state added
@@ -25,8 +46,8 @@
 <li><a href="hgefont_getprewidth.html">hgeFont::GetPreWidth</a> and <a href="hgefont_getpostwidth.html">hgeFont::GetPostWidth</a> were added
 <li><a href="hgefont_getstringwidth.html">hgeFont::GetStringWidth</a> now have additional parameter <b>bMultiline</b>
 <li><a href="hgeparticle_setscale.html">hgeParticleSystem::SetScale</a> and <a href="hgeparticle_getscale.html">hgeParticleSystem::GetScale</a> were added
-<li>HGE now correctly handles window (de)activation done by clicking the taskbar tab
-<li>HGE now correctly handles changes of desktop color depth on the fly
+<li><b>HGE</b> now correctly handles window (de)activation done by clicking the taskbar tab
+<li><b>HGE</b> now correctly handles changes of desktop color depth on the fly
 <li>Several potential memory leaks were fixed
 <li>Several minor fixes in documentation
 </ul>

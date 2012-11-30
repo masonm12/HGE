@@ -32,6 +32,7 @@ bool PlaceSymbols(int nWidth, int nHeight, CSymbolRange *pRanges, int nRangeCoun
 
 HTEXTURE FontGenerate(char *szFontName,
 					  int nSize,
+					  int nPaddingTop, int nPaddingBtm, int nPaddingLft, int nPaddingRgt,
 					  bool bBold,
 					  bool bItalic,
 					  bool bAntialias,
@@ -80,8 +81,8 @@ HTEXTURE FontGenerate(char *szFontName,
 			// reserve pixels for antialiasing
 			vChars[j].a = int(abc.abcfA)-1;
 			vChars[j].c = int(abc.abcfC)-1;
-			vChars[j].w = int(abc.abcfB)+2;
-			vChars[j].h = tTextMetrics.tmHeight;
+			vChars[j].w = int(abc.abcfB)+2 + nPaddingLft+nPaddingRgt;
+			vChars[j].h = tTextMetrics.tmHeight + nPaddingTop+nPaddingBtm;
 		}
 	}
 
@@ -128,7 +129,7 @@ HTEXTURE FontGenerate(char *szFontName,
 		for (j = pRanges[i].First; j <= pRanges[i].Last; j++ )
 		{
 			char c = (char)j;
-			TextOut(hBMDC, vChars[j].x-vChars[j].a, vChars[j].y, &c, 1);
+			TextOut(hBMDC, vChars[j].x-vChars[j].a+nPaddingLft, vChars[j].y+nPaddingTop, &c, 1);
 		}
 	}
 	GdiFlush();

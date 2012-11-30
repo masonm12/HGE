@@ -241,14 +241,16 @@ int hgeGUIListbox::AddItem(char *item)
 
 void hgeGUIListbox::DeleteItem(int n)
 {
+	int i;
 	hgeGUIListboxItem *pItem=pItems, *pPrev=0;
 
 	if(n<0 || n>=GetNumItems()) return;
 
-	while(pItem) { pPrev=pItem;	pItem=pItem->next; }
+	for(i=0;i<n;i++) { pPrev=pItem;	pItem=pItem->next; }
 
 	if(pPrev) pPrev->next=pItem->next;
 	else pItems=pItem->next;
+
 	delete pItem;
 	nItems--;
 }
@@ -276,6 +278,7 @@ void hgeGUIListbox::Clear()
 		pItem=pNext;
 	}
 	
+	pItems=0;
 	nItems=0;
 }
 

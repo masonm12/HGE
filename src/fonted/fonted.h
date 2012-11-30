@@ -71,6 +71,7 @@ struct FEditorState
 
 	char				*FontFamily;
 	int					nSize;
+	int					nPadTop, nPadBtm, nPadLft, nPadRgt;
 	bool				bBold;
 	bool				bItalic;
 	bool				bAntialias;
@@ -96,6 +97,7 @@ bool DoCommands(int id);
 bool SavePNG(HTEXTURE tex, char *filename);
 HTEXTURE FontGenerate(char *szFontName,
 					  int nSize,
+					  int nPaddingTop, int nPaddingBtm, int nPaddingLft, int nPaddingRgt,
 					  bool bItalic,
 					  bool bBold,
 					  bool bAntialias,

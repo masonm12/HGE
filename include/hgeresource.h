@@ -56,11 +56,11 @@ public:
 	bool				Precache(int groupid=0);
 	void				Purge(int groupid=0);
 
-	void*				GetResource(const char *name);
-	HTEXTURE			GetTexture(const char *name);
-	HEFFECT				GetEffect(const char *name);
-	HMUSIC				GetMusic(const char *name);
-	HSTREAM				GetStream(const char *name);
+	void*				GetResource(const char *name, int resgroup=0);
+	HTEXTURE			GetTexture(const char *name, int resgroup=0);
+	HEFFECT				GetEffect(const char *name, int resgroup=0);
+	HMUSIC				GetMusic(const char *name, int resgroup=0);
+	HSTREAM				GetStream(const char *name, int resgroup=0);
 	HTARGET				GetTarget(const char *name);
 
 	hgeSprite*			GetSprite(const char *name);
@@ -68,7 +68,7 @@ public:
 	hgeFont*			GetFont(const char *name);
 	hgeParticleSystem*	GetParticleSystem(const char *name);
 	hgeDistortionMesh*	GetDistortionMesh(const char *name);
-	hgeStringTable*		GetStringTable(const char *name);
+	hgeStringTable*		GetStringTable(const char *name, int resgroup=0);
 
 	ResDesc*			res[RESTYPES];
 

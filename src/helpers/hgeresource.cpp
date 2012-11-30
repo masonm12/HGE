@@ -109,7 +109,7 @@ void hgeResourceManager::Purge(int groupid)
 	}
 }
 
-void* hgeResourceManager::GetResource(const char *name)
+void* hgeResourceManager::GetResource(const char *name, int resgroup)
 {
 	void *reshandle;
 	RResource *resource;
@@ -123,7 +123,7 @@ void* hgeResourceManager::GetResource(const char *name)
 		{
 			resource=new RResource();
 			resource->handle=(DWORD)reshandle;
-			resource->resgroup=0;
+			resource->resgroup=resgroup;
 			strcpy(resource->name, name);
 			strcpy(resource->filename, name);
 			AddRes(this, RES_RESOURCE, resource);
@@ -135,7 +135,7 @@ void* hgeResourceManager::GetResource(const char *name)
 	return 0;
 }
 
-HTEXTURE hgeResourceManager::GetTexture(const char *name)
+HTEXTURE hgeResourceManager::GetTexture(const char *name, int resgroup)
 {
 	HTEXTURE reshandle;
 	RTexture *resource;
@@ -148,7 +148,8 @@ HTEXTURE hgeResourceManager::GetTexture(const char *name)
 		{
 			resource=new RTexture();
 			resource->handle=reshandle;
-			resource->resgroup=0;
+			resource->resgroup=resgroup;
+			resource->mipmap=false;
 			strcpy(resource->name, name);
 			strcpy(resource->filename, name);
 			AddRes(this, RES_TEXTURE, resource);
@@ -160,7 +161,7 @@ HTEXTURE hgeResourceManager::GetTexture(const char *name)
 	return 0;
 }
 
-HEFFECT hgeResourceManager::GetEffect(const char *name)
+HEFFECT hgeResourceManager::GetEffect(const char *name, int resgroup)
 {
 	HEFFECT reshandle;
 	REffect *resource;
@@ -173,7 +174,7 @@ HEFFECT hgeResourceManager::GetEffect(const char *name)
 		{
 			resource=new REffect();
 			resource->handle=reshandle;
-			resource->resgroup=0;
+			resource->resgroup=resgroup;
 			strcpy(resource->name, name);
 			strcpy(resource->filename, name);
 			AddRes(this, RES_EFFECT, resource);
@@ -185,7 +186,7 @@ HEFFECT hgeResourceManager::GetEffect(const char *name)
 	return 0;
 }
 
-HMUSIC hgeResourceManager::GetMusic(const char *name)
+HMUSIC hgeResourceManager::GetMusic(const char *name, int resgroup)
 {
 	HMUSIC reshandle;
 	RMusic *resource;
@@ -198,7 +199,7 @@ HMUSIC hgeResourceManager::GetMusic(const char *name)
 		{
 			resource=new RMusic();
 			resource->handle=reshandle;
-			resource->resgroup=0;
+			resource->resgroup=resgroup;
 			strcpy(resource->name, name);
 			strcpy(resource->filename, name);
 			AddRes(this, RES_MUSIC, resource);
@@ -210,7 +211,7 @@ HMUSIC hgeResourceManager::GetMusic(const char *name)
 	return 0;
 }
 
-HSTREAM hgeResourceManager::GetStream(const char *name)
+HSTREAM hgeResourceManager::GetStream(const char *name, int resgroup)
 {
 	HSTREAM reshandle;
 	RStream *resource;
@@ -223,7 +224,7 @@ HSTREAM hgeResourceManager::GetStream(const char *name)
 		{
 			resource=new RStream();
 			resource->handle=reshandle;
-			resource->resgroup=0;
+			resource->resgroup=resgroup;
 			strcpy(resource->name, name);
 			strcpy(resource->filename, name);
 			AddRes(this, RES_STREAM, resource);
@@ -277,7 +278,7 @@ hgeDistortionMesh* hgeResourceManager::GetDistortionMesh(const char *name)
 	else return 0;
 }
 
-hgeStringTable* hgeResourceManager::GetStringTable(const char *name)
+hgeStringTable* hgeResourceManager::GetStringTable(const char *name, int resgroup)
 {
 	hgeStringTable *strtable;
 	RStringTable *resource;
@@ -290,7 +291,7 @@ hgeStringTable* hgeResourceManager::GetStringTable(const char *name)
 		{
 			resource=new RStringTable();
 			resource->handle=(DWORD)strtable;
-			resource->resgroup=0;
+			resource->resgroup=resgroup;
 			strcpy(resource->name, name);
 			strcpy(resource->filename, name);
 			AddRes(this, RES_STRTABLE, resource);

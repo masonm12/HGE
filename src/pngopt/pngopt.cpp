@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.8
-** Copyright (C) 2003-2006, Relish Games
+** Haaf's Game Engine 1.81
+** Copyright (C) 2003-2008, Relish Games
 ** hge.relishgames.com
 **
 ** PNG Images Optimizer
@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
 	char				*buf, filename[256];
 	filelist			*newFile, *nextFile;
 
-	printf("\nPNG Optimizer\nCopyright (C) 2003-2006, Relish Games\n\n");
+	printf("\nPNG Optimizer v0.2\nCopyright (C) 2003-2008, Relish Games\n\n");
 	
 	if(argc!=2)
 	{
@@ -87,9 +87,9 @@ int main(int argc, char* argv[])
 		hge=hgeCreate(HGE_VERSION);
 		hge->System_SetState(HGE_USESOUND, false);
 		hge->System_SetState(HGE_WINDOWED, true);
-		hge->System_SetState(HGE_SCREENWIDTH, 640);
-		hge->System_SetState(HGE_SCREENHEIGHT, 480);
-		hge->System_SetState((hgeIntState)14, 0xFACE0FF);
+		hge->System_SetState(HGE_SCREENWIDTH, 320);
+		hge->System_SetState(HGE_SCREENHEIGHT, 200);
+		hge->System_SetState(HGE_SHOWSPLASH, false);
 
 		if(!hge->System_Initiate())
 		{

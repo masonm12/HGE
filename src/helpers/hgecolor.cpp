@@ -41,8 +41,8 @@ void hgeColorHSV::SetHWColor(DWORD col)
 		del_B = (((maxv - b) / 6) + (delta / 2)) / delta;
 
 		if      (r == maxv) {h = del_B - del_G;}
-		else if (g == maxv) {h = (1 / 3) + del_R - del_B;}
-		else if (b == maxv) {h = (2 / 3) + del_G - del_R;}
+		else if (g == maxv) {h = (1.0f / 3.0f) + del_R - del_B;}
+		else if (b == maxv) {h = (2.0f / 3.0f) + del_G - del_R;}
 		
 		if (h < 0) h += 1;
 		if (h > 1) h -= 1;

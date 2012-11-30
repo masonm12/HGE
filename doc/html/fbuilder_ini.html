@@ -20,13 +20,26 @@
 <h2>Initialization file</h2>
 <p>
 <b>HGE</b> Bitmap Font Builder keeps it's system variables in <b>fonted.ini</b> file.
-So, you can modify them to adjust builder's behavior. Currently, the following parameter
-is supported:
+So, you can modify them to adjust builder's behavior. Currently, the following parameters
+are supported:
 </p>
 <dl>
 <dt>FullScreen
 <dd>If = 1, the editor runs in fullscreen. If = 0, the editor runs in window. Default is 0.
 </dl>
+<dl>
+<dt>PaddingTop
+<dd>Number of empty pixels to add to the top of every generated character.<br>Default is 0.
+<dt>PaddingBottom
+<dd>Number of empty pixels to add to the bottom of every generated character.<br>Default is 0.
+<dt>PaddingLeft
+<dd>Number of empty pixels to add to the left of every generated character.<br>Default is 0.
+<dt>PaddingRight
+<dd>Number of empty pixels to add to the right of every generated character.<br>Default is 0.
+</dl>
+<p>
+The paddings are useful if you want to add additional effects to the generated font in a graphics package.
+</p>
 <br>
 </td></tr></table>
 </td>
