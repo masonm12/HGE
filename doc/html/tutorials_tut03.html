@@ -88,7 +88,7 @@ We create a particle system and a sprite for it:
     spt->SetBlendMode(
               BLEND_COLORMUL | BLEND_ALPHAADD | BLEND_NOZWRITE);
     spt->SetHotSpot(16, 16);
-    par=new hgeParticleSystem("trail.psi", spt, 0);
+    par=new hgeParticleSystem("trail.psi", spt);
     par->Fire();
 </pre>
 <p>

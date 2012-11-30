@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.5
-** Copyright (C) 2003-2004, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** hgeRect helper class

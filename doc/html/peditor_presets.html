@@ -29,16 +29,10 @@ from the preset and have your sprite for rendering particles ready:
 </p>
 <pre>
 hgeParticleSystem *ps;
-ps = new hgeParticleSystem("particle1.psi", sprite, 50);
+ps = new hgeParticleSystem("particle1.psi", sprite);
 </pre>
 <p>
 Voila! The particle system is ready to run!
-<br><br>
-The last parameter of the <a href="hgeparticle__main.html">hgeParticleSystem</a>
-constructor is the frame rate at which the system should be updated.
-The particle systems use non-linear functions for the motion, thus their
-appearance may vary depending on the frame rate. So this is the way to keep
-them consistent at any frame rate.
 </p>
 <h2>Initialization, the not so simple way</h2>
 <p>
@@ -94,7 +88,7 @@ And finally let's create the particle system object and delete the preset
 from memory as it isn't needed longer:
 </p>
 <pre>
-hgeParticleSystem *ps = new hgeParticleSystem(psi, 50);
+hgeParticleSystem *ps = new hgeParticleSystem(psi);
 hge->Resource_Free(psi);
 </pre>
 <p>

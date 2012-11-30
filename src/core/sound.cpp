@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.5
-** Copyright (C) 2003-2004, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** Core functions implementation: audio routines
@@ -85,19 +85,25 @@ HCHANNEL CALL HGE_Impl::Effect_PlayEx(HEFFECT eff, int volume, int pan, float pi
 		BASS_SAMPLE info;
 		HCHANNEL chn;
 		BASS_SampleGetInfo(eff, &info);
+
 		chn=BASS_SampleGetChannel(eff, FALSE);
 		BASS_ChannelSetAttributes(chn, (int)(pitch*info.freq), volume, pan);
-		BASS_ChannelSetFlags(chn, loop ? BASS_SAMPLE_LOOP:0);
+
+		info.flags &= ~BASS_SAMPLE_LOOP;
+		if(loop) info.flags |= BASS_SAMPLE_LOOP;
+		BASS_ChannelSetFlags(chn, info.flags);
 		BASS_ChannelPlay(chn, TRUE);
 		return chn;
 	}
 	else return 0;
 }
 
+
 void CALL HGE_Impl::Effect_Free(HEFFECT eff)
 {
 	if(hBass) BASS_SampleFree(eff);
 }
+
 
 HMUSIC CALL HGE_Impl::Music_Load(const char *filename, DWORD size)
 {
@@ -107,13 +113,18 @@ HMUSIC CALL HGE_Impl::Music_Load(const char *filename, DWORD size)
 
 	if(hBass)
 	{
-		if(size) { data=(void *)filename; _size=size; }
+		if(size)
+		{
+			data=(void *)filename;
+			_size=size;
+		}
 		else
 		{
 			data=Resource_Load(filename, &_size);
 			if(!data) return 0;
 		}
-		hm=BASS_MusicLoad(TRUE, data, 0, _size, (BASS_MUSIC_PRESCAN | BASS_MUSIC_POSRESET), 0);
+
+		hm=BASS_MusicLoad(TRUE, data, 0, 0, BASS_MUSIC_PRESCAN | BASS_MUSIC_POSRESETEX | BASS_MUSIC_RAMP, 0);
 		if(!hm)	_PostError("Can't load music");
 		if(!size) Resource_Free(data);
 		return hm;
@@ -121,15 +132,25 @@ HMUSIC CALL HGE_Impl::Music_Load(const char *filename, DWORD size)
 	else return 0;
 }
 
-HCHANNEL CALL HGE_Impl::Music_Play(HMUSIC mus, bool loop)
+HCHANNEL CALL HGE_Impl::Music_Play(HMUSIC mus, bool loop, int volume, int order, int row)
 {
 	if(hBass)
 	{
+		DWORD pos = BASS_MusicGetOrderPosition(mus);
+		if(order == -1) order = LOWORD(pos);
+		if(row == -1) row = HIWORD(pos);
+		BASS_ChannelSetPosition(mus, MAKEMUSICPOS(order, row));
+
 		BASS_CHANNELINFO info;
 		BASS_ChannelGetInfo(mus, &info);
-		BASS_ChannelSetAttributes(mus, info.freq, 100, 0);
-		BASS_ChannelSetFlags(mus, loop ? BASS_SAMPLE_LOOP:0);
-		BASS_ChannelPlay(mus, TRUE);
+		BASS_ChannelSetAttributes(mus, info.freq, volume, 0);
+
+		info.flags &= ~BASS_SAMPLE_LOOP;
+		if(loop) info.flags |= BASS_SAMPLE_LOOP;
+		BASS_ChannelSetFlags(mus, info.flags);
+
+		BASS_ChannelPlay(mus, FALSE);
+
 		return mus;
 	}
 	else return 0;
@@ -138,6 +159,82 @@ HCHANNEL CALL HGE_Impl::Music_Play(HMUSIC mus, bool loop)
 void CALL HGE_Impl::Music_Free(HMUSIC mus)
 {
 	if(hBass) BASS_MusicFree(mus);
+}
+
+void CALL HGE_Impl::Music_SetAmplification(HMUSIC music, int ampl)
+{
+	if(hBass) BASS_MusicSetAttribute(music, BASS_MUSIC_ATTRIB_AMPLIFY, ampl);
+}
+
+int CALL HGE_Impl::Music_GetAmplification(HMUSIC music)
+{
+	if(hBass) return BASS_MusicGetAttribute(music, BASS_MUSIC_ATTRIB_AMPLIFY);
+	else return -1;
+}
+
+int CALL HGE_Impl::Music_GetLength(HMUSIC music)
+{
+	if(hBass)
+	{
+		return BASS_MusicGetOrders(music);
+	}
+	else return -1;
+}
+
+void CALL HGE_Impl::Music_SetPos(HMUSIC music, int order, int row)
+{
+	if(hBass)
+	{
+		BASS_ChannelSetPosition(music, MAKEMUSICPOS(order, row));
+	}
+}
+
+bool CALL HGE_Impl::Music_GetPos(HMUSIC music, int *order, int *row)
+{
+	if(hBass)
+	{
+		DWORD pos;
+		pos = BASS_MusicGetOrderPosition(music);
+		if(pos == -1) return false;
+		*order = LOWORD(pos);
+		*row = HIWORD(pos);
+		return true;
+	}
+	else return false;
+}
+
+void CALL HGE_Impl::Music_SetInstrVolume(HMUSIC music, int instr, int volume)
+{
+	if(hBass)
+	{
+		BASS_MusicSetAttribute(music, BASS_MUSIC_ATTRIB_VOL_INST + instr, volume);		
+	}
+}
+
+int CALL HGE_Impl::Music_GetInstrVolume(HMUSIC music, int instr)
+{
+	if(hBass)
+	{
+		return BASS_MusicGetAttribute(music, BASS_MUSIC_ATTRIB_VOL_INST + instr);		
+	}
+	else return -1;
+}
+
+void CALL HGE_Impl::Music_SetChannelVolume(HMUSIC music, int channel, int volume)
+{
+	if(hBass)
+	{
+		BASS_MusicSetAttribute(music, BASS_MUSIC_ATTRIB_VOL_CHAN + channel, volume);		
+	}
+}
+
+int CALL HGE_Impl::Music_GetChannelVolume(HMUSIC music, int channel)
+{
+	if(hBass)
+	{
+		return BASS_MusicGetAttribute(music, BASS_MUSIC_ATTRIB_VOL_CHAN + channel);		
+	}
+	else return -1;
 }
 
 HSTREAM CALL HGE_Impl::Stream_Load(const char *filename, DWORD size)
@@ -207,7 +304,10 @@ HCHANNEL CALL HGE_Impl::Stream_Play(HSTREAM stream, bool loop, int volume)
 		BASS_CHANNELINFO info;
 		BASS_ChannelGetInfo(stream, &info);
 		BASS_ChannelSetAttributes(stream, info.freq, volume, 0);
-		BASS_ChannelSetFlags(stream, loop ? BASS_SAMPLE_LOOP:0);
+
+		info.flags &= ~BASS_SAMPLE_LOOP;
+		if(loop) info.flags |= BASS_SAMPLE_LOOP;
+		BASS_ChannelSetFlags(stream, info.flags);
 		BASS_ChannelPlay(stream, TRUE);
 		return stream;
 	}
@@ -249,9 +349,23 @@ void CALL HGE_Impl::Channel_Stop(HCHANNEL chn)
 	if(hBass) BASS_ChannelStop(chn);
 }
 
+void CALL HGE_Impl::Channel_PauseAll()
+{
+	if(hBass) BASS_Pause();
+}
+
+void CALL HGE_Impl::Channel_ResumeAll()
+{
+	if(hBass) BASS_Start();
+}
+
 void CALL HGE_Impl::Channel_StopAll()
 {
-	if(hBass) { BASS_Stop();BASS_Start(); }
+	if(hBass)
+	{
+		BASS_Stop();
+		BASS_Start();
+	}
 }
 
 bool CALL HGE_Impl::Channel_IsPlaying(HCHANNEL chn)
@@ -287,6 +401,31 @@ void CALL HGE_Impl::Channel_SetPos(HCHANNEL chn, float fSeconds) {
 	}
 }
 
+void CALL HGE_Impl::Channel_SlideTo(HCHANNEL channel, float time, int volume, int pan, float pitch)
+{
+	if(hBass)
+	{
+		BASS_CHANNELINFO info;
+		BASS_ChannelGetInfo(channel, &info);
+
+		int freq;
+		if(pitch == -1) freq = -1;
+		else freq = (int)(pitch*info.freq);
+
+		BASS_ChannelSlideAttributes(channel, freq, volume, pan, DWORD(time*1000));
+	}
+}
+
+bool CALL HGE_Impl::Channel_IsSliding(HCHANNEL channel)
+{
+	if(hBass)
+	{
+		if(BASS_ChannelIsSliding(channel)) return true;
+		else return false;
+	}
+	else return false;
+}
+
 
 //////// Implementation ////////
 
@@ -304,7 +443,7 @@ bool HGE_Impl::_SoundInit()
 
 	LOADBASSFUNCTION(BASS_GetVersion);
 
-	if (BASS_GetVersion()!=MAKELONG(2,2))
+	if (HIWORD(BASS_GetVersion()) != BASSVERSION)
 	{
 		_PostError("Incorrect BASS.DLL version");
 		return false;
@@ -314,6 +453,7 @@ bool HGE_Impl::_SoundInit()
 	LOADBASSFUNCTION(BASS_Init);
 	LOADBASSFUNCTION(BASS_Free);
 	LOADBASSFUNCTION(BASS_Start);
+	LOADBASSFUNCTION(BASS_Pause);
 	LOADBASSFUNCTION(BASS_Stop);
 	LOADBASSFUNCTION(BASS_SetConfig);
 
@@ -326,6 +466,10 @@ bool HGE_Impl::_SoundInit()
 	
 	LOADBASSFUNCTION(BASS_MusicLoad);
 	LOADBASSFUNCTION(BASS_MusicFree);
+	LOADBASSFUNCTION(BASS_MusicGetOrders);
+	LOADBASSFUNCTION(BASS_MusicGetOrderPosition);
+	LOADBASSFUNCTION(BASS_MusicSetAttribute);
+	LOADBASSFUNCTION(BASS_MusicGetAttribute);
 
 	LOADBASSFUNCTION(BASS_StreamCreateFile);
 	LOADBASSFUNCTION(BASS_StreamFree);
@@ -333,6 +477,8 @@ bool HGE_Impl::_SoundInit()
 	LOADBASSFUNCTION(BASS_ChannelGetInfo);
 	LOADBASSFUNCTION(BASS_ChannelGetAttributes);
 	LOADBASSFUNCTION(BASS_ChannelSetAttributes);
+	LOADBASSFUNCTION(BASS_ChannelSlideAttributes);
+	LOADBASSFUNCTION(BASS_ChannelIsSliding);
 	LOADBASSFUNCTION(BASS_ChannelSetFlags);
 	LOADBASSFUNCTION(BASS_ChannelGetData);
 	LOADBASSFUNCTION(BASS_ChannelPlay);
@@ -346,7 +492,7 @@ bool HGE_Impl::_SoundInit()
 	LOADBASSFUNCTION(BASS_ChannelBytes2Seconds);
 
 	bSilent=false;
-	if (!BASS_Init(1,nSampleRate,0,hwnd,NULL))
+	if (!BASS_Init(-1,nSampleRate,0,hwnd,NULL))
 	{
 		System_Log("BASS Init failed, using no sound");
 		BASS_Init(0,nSampleRate,0,hwnd,NULL);
@@ -357,6 +503,9 @@ bool HGE_Impl::_SoundInit()
 		System_Log("Sound Device: %s",BASS_GetDeviceDescription(1));
 		System_Log("Sample rate: %ld\n", nSampleRate);
 	}
+
+	//BASS_SetConfig(BASS_CONFIG_BUFFER, 5000);
+	//BASS_SetConfig(BASS_CONFIG_UPDATEPERIOD, 50);
 
 	_SetFXVolume(nFXVolume);
 	_SetMusVolume(nMusVolume);

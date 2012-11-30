@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.6
-** Copyright (C) 2003-2006, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** hgeStringTable helper class header

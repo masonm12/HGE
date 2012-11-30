@@ -19,7 +19,6 @@
 <h1 style="margin-top:0px">hgeParticleSystem::Transpose</h1>
 <p>
 Adds constant particle system's coordinates shift.
-This funcion may be useful to implement game level/map scrolling.
 </p>
 <pre>
 void Transpose(
@@ -34,6 +33,14 @@ void Transpose(
 <dt><i>dy</i>
 <dd>Y-coordinate displacement.
 </dl>
+<h2>Remarks</h2>
+<p>
+Unlike <a href="hgeparticle_moveto.html">MoveTo</a> this function doesn't physically
+changes coordinates of the emitter and it's particles. It just adds a constant offset
+into the particle system geometry pipeline. This is useful when you want to move
+a particle system with all it's particles (faster than <b>MoveTo</b>) and also
+allows you to manipulate particle system in game-space coordinates (game level/map scrolling).
+</p>
 <h2>Requirements</h2>
 <p>
 <b>Header:</b> hgeparticle.h<br>

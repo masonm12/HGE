@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.5
-** Copyright (C) 2003-2004, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** hgeSprite helper class header
@@ -32,12 +32,12 @@ public:
 	void		Render4V(float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3);
 
 	void		SetTexture(HTEXTURE tex);
-	void		SetTextureRect(float x, float y, float w, float h);
+	void		SetTextureRect(float x, float y, float w, float h, bool adjSize = true);
 	void		SetColor(DWORD col, int i=-1);
 	void		SetZ(float z, int i=-1);
 	void		SetBlendMode(int blend) { quad.blend=blend; }
 	void		SetHotSpot(float x, float y) { hotX=x; hotY=y; }
-	void		SetFlip(bool bX, bool bY);
+	void		SetFlip(bool bX, bool bY, bool bHotSpot = false);
 
 	HTEXTURE	GetTexture() const { return quad.tex; }
 	void		GetTextureRect(float *x, float *y, float *w, float *h) const { *x=tx; *y=ty; *w=width; *h=height; }
@@ -47,10 +47,10 @@ public:
 	void		GetHotSpot(float *x, float *y) const { *x=hotX; *y=hotY; }
 	void		GetFlip(bool *bX, bool *bY) const { *bX=bXFlip; *bY=bYFlip; }
 
-	hgeRect*	GetBoundingBox(float x, float y, hgeRect *rect) const { rect->Set(x-hotX, y-hotY, x-hotX+width, y-hotY+height); return rect; }
-	hgeRect*	GetBoundingBoxEx(float x, float y, float rot, float hscale, float vscale,  hgeRect *rect) const;
 	float		GetWidth() const { return width; }
 	float		GetHeight() const { return height; }
+	hgeRect*	GetBoundingBox(float x, float y, hgeRect *rect) const { rect->Set(x-hotX, y-hotY, x-hotX+width, y-hotY+height); return rect; }
+	hgeRect*	GetBoundingBoxEx(float x, float y, float rot, float hscale, float vscale,  hgeRect *rect) const;
 
 protected:
 	hgeSprite();
@@ -60,7 +60,7 @@ protected:
 	float		tx, ty, width, height;
 	float		tex_width, tex_height;
 	float		hotX, hotY;
-	bool		bXFlip, bYFlip;
+	bool		bXFlip, bYFlip, bHSFlip;
 };
 
 

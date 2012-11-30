@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.5
-** Copyright (C) 2003-2004, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** Core functions implementation: input
@@ -90,8 +90,17 @@ bool CALL HGE_Impl::Input_IsMouseOver()
 
 bool CALL HGE_Impl::Input_GetKeyState(int key)
 {
-	if(bActive) return ((GetAsyncKeyState(key) & 0x8000) != 0);
-	else return 0;
+	return ((GetKeyState(key) & 0x8000) != 0);
+}
+
+bool CALL HGE_Impl::Input_KeyDown(int key)
+{
+	return (keyz[key] & 1) != 0;
+}
+
+bool CALL HGE_Impl::Input_KeyUp(int key)
+{
+	return (keyz[key] & 2) != 0;
 }
 
 char* CALL HGE_Impl::Input_GetKeyName(int key)
@@ -113,6 +122,32 @@ int CALL HGE_Impl::Input_GetChar()
 //////// Implementation ////////
 
 
+void HGE_Impl::_InputInit()
+{
+	POINT	pt;
+	GetCursorPos(&pt);
+	ScreenToClient(hwnd, &pt);
+	Xpos = (float)pt.x;
+	Ypos = (float)pt.y;
+
+	memset(&keyz, 0, sizeof(keyz));
+}
+
+void HGE_Impl::_UpdateMouse()
+{
+	POINT	pt;
+	RECT	rc;
+
+	GetCursorPos(&pt);
+	GetClientRect(hwnd, &rc);
+	MapWindowPoints(hwnd, NULL, (LPPOINT)&rc, 2);
+
+	if(bCaptured || (PtInRect(&rc, pt) && WindowFromPoint(pt)==hwnd))
+		bMouseOver=true;
+	else
+		bMouseOver=false;
+}
+
 void HGE_Impl::_BuildEvent(int type, int key, int scan, int flags, int x, int y)
 {
 	CInputEventList *last, *eptr=new CInputEventList;
@@ -124,8 +159,14 @@ void HGE_Impl::_BuildEvent(int type, int key, int scan, int flags, int x, int y)
 	pt.x=x; pt.y=y;
 
 	GetKeyboardState(kbstate);
-	if(type==INPUT_KEYDOWN || type==INPUT_KEYUP)
+	if(type==INPUT_KEYDOWN)
 	{
+		if((flags & HGEINP_REPEAT) == 0) keyz[key] |= 1;
+		ToAscii(key, scan, kbstate, (unsigned short *)&eptr->event.chr, 0);
+	}
+	if(type==INPUT_KEYUP)
+	{
+		keyz[key] |= 2;
 		ToAscii(key, scan, kbstate, (unsigned short *)&eptr->event.chr, 0);
 	}
 	if(type==INPUT_MOUSEWHEEL)
@@ -137,11 +178,13 @@ void HGE_Impl::_BuildEvent(int type, int key, int scan, int flags, int x, int y)
 
 	if(type==INPUT_MBUTTONDOWN)
 	{
+		keyz[key] |= 1;
 		SetCapture(hwnd);
 		bCaptured=true;
 	}
 	if(type==INPUT_MBUTTONUP)
 	{
+		keyz[key] |= 2;
 		ReleaseCapture();
 		Input_SetMousePos(Xpos, Ypos);
 		pt.x=(int)Xpos; pt.y=(int)Ypos;
@@ -195,6 +238,8 @@ void HGE_Impl::_BuildEvent(int type, int key, int scan, int flags, int x, int y)
 void HGE_Impl::_ClearQueue()
 {
 	CInputEventList *nexteptr, *eptr=queue;
+
+	memset(&keyz, 0, sizeof(keyz));
 	
 	while(eptr)
 	{

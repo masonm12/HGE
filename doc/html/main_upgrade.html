@@ -22,6 +22,16 @@
 to your code written for previous versions to compile it with the latest release of <b>HGE</b>. Here's the brief guidelines
 for the modifications needed:
 </p>
+<h2>Upgrading from HGE 1.6</h2>
+<p>
+<ol>
+<li>Adjust all your particle system presets with the new editor. Basically you should just raise "Start speed", "Gravity", "Radial acceleration" and "Tangential acceleration" values.
+<li>Use <a href="hgeconst_systemstate.html#HGE_SHOWSPLASH">HGE_SHOWSPLASH</a> to hide HGE splash screen instead of earlier <b>(hgeIntState)14</b> hack.
+<li>If you used <a href="hgesprite_settexturerect.html">hgeSprite::SetTextureRect</a> or <b>hgeAnimation::SetTextureRect</b>, put additional <b>false</b> argument into the calls.
+<li>If you used render targets, you now should restore them in <a href="hgeconst_systemstate.html#HGE_GFXRESTOREFUNC">HGE_GFXRESTOREFUNC</a>, not in <a href="hgeconst_systemstate.html#HGE_FOCUSGAINFUNC">HGE_FOCUSGAINFUNC</a> as earlier.
+<li>If you used <a href="hgefunc_gfxstartbatch.html">Gfx_StartBatch</a> - insert a check if the return value is not 0.
+</ol>
+</p>
 <h2>Upgrading from HGE 1.54</h2>
 <p>
 <ol>

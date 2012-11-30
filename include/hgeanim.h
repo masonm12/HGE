@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.5
-** Copyright (C) 2003-2004, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** hgeAnimation helper class header
@@ -31,13 +31,13 @@ public:
 	hgeAnimation(HTEXTURE tex, int nframes, float FPS, float x, float y, float w, float h);
 	hgeAnimation(const hgeAnimation &anim);
 	
-	
 	void		Play();
 	void		Stop() { bPlaying=false; }
 	void		Resume() { bPlaying=true; }
 	void		Update(float fDeltaTime);
 	bool		IsPlaying() const { return bPlaying; }
 
+	void		SetTexture(HTEXTURE tex) { hgeSprite::SetTexture(tex); orig_width = hge->Texture_GetWidth(tex, true); }
 	void		SetTextureRect(float x1, float y1, float x2, float y2) { hgeSprite::SetTextureRect(x1,y1,x2,y2); SetFrame(nCurFrame); }
 	void		SetMode(int mode);
 	void		SetSpeed(float FPS) { fSpeed=1.0f/FPS; }
@@ -51,6 +51,8 @@ public:
 
 private:
 	hgeAnimation();
+
+	int			orig_width;
 
 	bool		bPlaying;
 

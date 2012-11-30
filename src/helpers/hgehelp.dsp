@@ -89,6 +89,10 @@ SOURCE=.\hgeanim.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\hgecolor.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\hgedistort.cpp
 # End Source File
 # Begin Source File

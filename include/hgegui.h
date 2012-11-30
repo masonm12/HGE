@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.5
-** Copyright (C) 2003-2004, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** hgeGUI helper classes header
@@ -29,7 +29,7 @@ class hgeGUI;
 class hgeGUIObject
 {
 public:
-	hgeGUIObject()	{ hge=hgeCreate(HGE_VERSION); }
+	hgeGUIObject()	{ hge=hgeCreate(HGE_VERSION); color=0xFFFFFFFF; }
 	virtual			~hgeGUIObject() { hge->Release(); }
 
 	virtual void	Render() = 0;
@@ -37,6 +37,7 @@ public:
 
 	virtual void	Enter() {}
 	virtual void	Leave() {}
+	virtual void	Reset() {}
 	virtual bool	IsDone() { return true; }
 	virtual void	Focus(bool bFocused) {}
 	virtual void	MouseOver(bool bOver) {}
@@ -47,11 +48,14 @@ public:
 	virtual bool	MouseWheel(int nNotches) { return false; }
 	virtual bool	KeyClick(int key, int chr) { return false; }
 
+	virtual void	SetColor(DWORD _color) { color=_color; }
+	
 	int				id;
 	bool			bStatic;
 	bool			bVisible;
 	bool			bEnabled;
 	hgeRect			rect;
+	DWORD			color;
 
 	hgeGUI			*gui;
 	hgeGUIObject	*next;
@@ -84,11 +88,14 @@ public:
 
 	void			SetNavMode(int mode);
 	void			SetCursor(hgeSprite *spr);
+	void			SetColor(DWORD color);
 	void			SetFocus(int id);
 	int				GetFocus() const;
 	
 	void			Enter();
 	void			Leave();
+	void			Reset();
+	void			Move(float dx, float dy);
 
 	int				Update(float dt);
 	void			Render();

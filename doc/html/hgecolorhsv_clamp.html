@@ -11,29 +11,27 @@
 <script language="JavaScript" src="hge.js"></script>
 </head>
 
-<body onload="setContents('cnt_hgecolor.html');" bgcolor=#ffffff text=#000000 link=#7F0000 vlink=#7F0000 alink=#7F0000 marginwidth=0 marginheight=0 leftmargin=0 topmargin=0>
+<body onload="setContents('cnt_hgecolorhsv.html');" bgcolor=#ffffff text=#000000 link=#7F0000 vlink=#7F0000 alink=#7F0000 marginwidth=0 marginheight=0 leftmargin=0 topmargin=0>
 <table height=100% cellspacing=0 cellpadding=0 border=0><tr>
 
 <td valign=top>
 <table width=566 cellspacing=0 cellpadding=20 border=0><tr><td>
-<h1 style="margin-top:0px">hgeColor::GetHWColor</h1>
+<h1 style="margin-top:0px">hgeColorHSV::Clamp</h1>
 <p>
-Returns hardware color from <b>hgeColor</b> value.
+Clamps the color to the allowed range after calculations.
 </p>
 <pre>
-DWORD GetHWColor();
+void Clamp();
 </pre>
-<h2>Return value</h2>
+<h2>Remarks</h2>
 <p>
-The hardware color, converted from the <b>hgeColor</b> value.
+When doing calculations the color component values may exceed the allowed
+range from 0.0 to 1.0. Use this function after calculations to clamp
+the color components to the allowed range.
 </p>
 <h2>Requirements</h2>
 <p>
 <b>Header:</b> hgecolor.h<br>
-</p>
-<h2>See also</h2>
-<p>
-<a href="hgedata_hwcolor.html">Hardware color format</a>
 </p>
 <br>
 </td></tr></table>

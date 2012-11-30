@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.5
-** Copyright (C) 2003-2004, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** hgeFont helper class header
@@ -31,11 +31,8 @@
 class hgeFont
 {
 public:
-	hgeFont(const char *filename);
-	hgeFont(const hgeFont &fnt);
+	hgeFont(const char *filename, bool bMipmap=false);
 	~hgeFont();
-
-	hgeFont&	operator= (const hgeFont &fnt);
 
 	void		Render(float x, float y, int align, const char *string);
 	void		printf(float x, float y, int align, const char *format, ...);
@@ -45,6 +42,7 @@ public:
 	void		SetZ(float z);
 	void		SetBlendMode(int blend);
 	void		SetScale(float scale) {fScale=scale;}
+	void		SetProportion(float prop) { fProportion=prop; }
 	void		SetRotation(float rot) {fRot=rot;}
 	void		SetTracking(float tracking) {fTracking=tracking;}
 	void		SetSpacing(float spacing) {fSpacing=spacing;}
@@ -53,6 +51,7 @@ public:
 	float		GetZ() const {return fZ;}
 	int			GetBlendMode() const {return nBlend;}
 	float		GetScale() const {return fScale;}
+	float		GetProportion() const { return fProportion; }
 	float		GetRotation() const {return fRot;}
 	float		GetTracking() const {return fTracking;}
 	float		GetSpacing() const {return fSpacing;}
@@ -63,11 +62,14 @@ public:
 
 private:
 	hgeFont();
+	hgeFont(const hgeFont &fnt);
+	hgeFont&	operator= (const hgeFont &fnt);
+
 	char*		_get_line(char *file, char *line);
 
 	static HGE	*hge;
 
-	char		buffer[1024];
+	static char	buffer[1024];
 
 	HTEXTURE	hTexture;
 	hgeSprite*	letters[256];
@@ -75,6 +77,7 @@ private:
 	float		post[256];
 	float		fHeight;
 	float		fScale;
+	float		fProportion;
 	float		fRot;
 	float		fTracking;
 	float		fSpacing;

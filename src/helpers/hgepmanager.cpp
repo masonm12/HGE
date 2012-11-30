@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.5
-** Copyright (C) 2003-2004, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** hgeParticleManager helper class implementation
@@ -10,10 +10,9 @@
 #include "..\..\include\hgeparticle.h"
 
 
-hgeParticleManager::hgeParticleManager(float fps)
+hgeParticleManager::hgeParticleManager()
 {
 	nPS=0;
-	fFPS=fps;
 	tX=tY=0.0f;
 }
 
@@ -48,7 +47,7 @@ void hgeParticleManager::Render()
 hgeParticleSystem* hgeParticleManager::SpawnPS(hgeParticleSystemInfo *psi, float x, float y)
 {
 	if(nPS==MAX_PSYSTEMS) return 0;
-	psList[nPS]=new hgeParticleSystem(psi,fFPS);
+	psList[nPS]=new hgeParticleSystem(psi);
 	psList[nPS]->FireAt(x,y);
 	psList[nPS]->Transpose(tX,tY);
 	nPS++;

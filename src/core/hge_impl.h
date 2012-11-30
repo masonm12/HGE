@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.5
-** Copyright (C) 2003-2004, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** Common core implementation header
@@ -95,7 +95,7 @@ public:
 	virtual bool		CALL	Resource_AttachPack(const char *filename, const char *password=0);
 	virtual void		CALL	Resource_RemovePack(const char *filename);
 	virtual void		CALL	Resource_RemoveAllPacks();
-	virtual char*		CALL	Resource_MakePath(const char *filename);
+	virtual char*		CALL	Resource_MakePath(const char *filename=0);
 	virtual char*		CALL	Resource_EnumFiles(const char *wildcard=0);
 	virtual char*		CALL	Resource_EnumFolders(const char *wildcard=0);
 
@@ -121,7 +121,16 @@ public:
 
 	virtual HMUSIC		CALL 	Music_Load(const char *filename, DWORD size=0);
 	virtual void		CALL	Music_Free(HMUSIC mus);
-	virtual HCHANNEL	CALL 	Music_Play(HMUSIC mus, bool loop);
+	virtual HCHANNEL	CALL 	Music_Play(HMUSIC mus, bool loop, int volume = 100, int order = 0, int row = 0);
+	virtual void		CALL	Music_SetAmplification(HMUSIC music, int ampl);
+	virtual int			CALL	Music_GetAmplification(HMUSIC music);
+	virtual int			CALL	Music_GetLength(HMUSIC music);
+	virtual void		CALL	Music_SetPos(HMUSIC music, int order, int row);
+	virtual bool		CALL	Music_GetPos(HMUSIC music, int *order, int *row);
+	virtual void		CALL	Music_SetInstrVolume(HMUSIC music, int instr, int volume);
+	virtual int			CALL	Music_GetInstrVolume(HMUSIC music, int instr);
+	virtual void		CALL	Music_SetChannelVolume(HMUSIC music, int channel, int volume);
+	virtual int			CALL	Music_GetChannelVolume(HMUSIC music, int channel);
 
 	virtual HSTREAM		CALL	Stream_Load(const char *filename, DWORD size=0);
 	virtual void		CALL	Stream_Free(HSTREAM stream);
@@ -133,16 +142,22 @@ public:
 	virtual void		CALL 	Channel_Pause(HCHANNEL chn);
 	virtual void		CALL 	Channel_Resume(HCHANNEL chn);
 	virtual void		CALL 	Channel_Stop(HCHANNEL chn);
+	virtual void		CALL 	Channel_PauseAll();
+	virtual void		CALL 	Channel_ResumeAll();
 	virtual void		CALL 	Channel_StopAll();
 	virtual bool		CALL	Channel_IsPlaying(HCHANNEL chn);
 	virtual float		CALL	Channel_GetLength(HCHANNEL chn);
 	virtual float		CALL	Channel_GetPos(HCHANNEL chn);
 	virtual void		CALL	Channel_SetPos(HCHANNEL chn, float fSeconds);
+	virtual void		CALL	Channel_SlideTo(HCHANNEL channel, float time, int volume, int pan = -101, float pitch = -1);
+	virtual bool		CALL	Channel_IsSliding(HCHANNEL channel);
 
 	virtual void		CALL	Input_GetMousePos(float *x, float *y);
 	virtual void		CALL	Input_SetMousePos(float x, float y);
 	virtual int			CALL	Input_GetMouseWheel();
 	virtual bool		CALL	Input_IsMouseOver();
+	virtual bool		CALL	Input_KeyDown(int key);
+	virtual bool		CALL	Input_KeyUp(int key);
 	virtual bool		CALL	Input_GetKeyState(int key);
 	virtual char*		CALL	Input_GetKeyName(int key);
 	virtual int			CALL	Input_GetKey();
@@ -192,6 +207,7 @@ public:
 	bool				(*procRenderFunc)();
 	bool				(*procFocusLostFunc)();
 	bool				(*procFocusGainFunc)();
+	bool				(*procGfxRestoreFunc)();
 	bool				(*procExitFunc)();
 	const char*			szIcon;
 	char				szWinTitle[256];
@@ -213,7 +229,7 @@ public:
 	HWND				hwndParent;
 
 	#ifdef DEMO
-	int					nDMO;
+	bool				bDMO;
 	#endif
 
 
@@ -251,7 +267,7 @@ public:
 
 	bool				_GfxInit();
 	void				_GfxDone();
-	void				_GfxRestore();
+	bool				_GfxRestore();
 	void				_AdjustWindow();
 	void				_Resize(int width, int height);
 	bool				_init_lost();
@@ -279,13 +295,16 @@ public:
 	float				Ypos;
 	bool				bMouseOver;
 	bool				bCaptured;
+	char				keyz[256];
 	CInputEventList*	queue;
+	void				_UpdateMouse();
+	void				_InputInit();
 	void				_ClearQueue();
 	void				_BuildEvent(int type, int key, int scan, int flags, int x, int y);
 
 
 	// Resource
-	char				szTmpFilename[256];
+	char				szTmpFilename[_MAX_PATH];
 	CResourceList*		res;
 	HANDLE				hSearch;
 	WIN32_FIND_DATA		SearchData;

@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.5
-** Copyright (C) 2003-2004, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** Core functions implementation: graphics
@@ -104,12 +104,19 @@ bool CALL HGE_Impl::Gfx_BeginScene(HTARGET targ)
 	LPDIRECT3DSURFACE8 pSurf=0, pDepth=0;
 	CRenderTargetList *target=(CRenderTargetList *)targ;
 
+	HRESULT hr = pD3DDevice->TestCooperativeLevel();
+	if (hr == D3DERR_DEVICELOST) return false;
+	else if (hr == D3DERR_DEVICENOTRESET)
+	{
+	    if(!_GfxRestore()) return false; 
+	}
+    
 	if(VertArray)
 	{
 		_PostError("Gfx_BeginScene: Scene is already being rendered");
 		return false;
 	}
-     
+	
 	if(target != pCurTarget)
 	{
 		if(target)
@@ -148,6 +155,7 @@ bool CALL HGE_Impl::Gfx_BeginScene(HTARGET targ)
 
 		pCurTarget=target;
 	}
+
 	pD3DDevice->BeginScene();
 	pVB->Lock( 0, 0, (BYTE**)&VertArray, 0 );
 
@@ -156,85 +164,97 @@ bool CALL HGE_Impl::Gfx_BeginScene(HTARGET targ)
 
 void CALL HGE_Impl::Gfx_EndScene()
 {
-	if(!VertArray) return;
 	_render_batch(true);
 	pD3DDevice->EndScene();
 	if(!pCurTarget) pD3DDevice->Present( NULL, NULL, NULL, NULL );
-	VertArray=0;
 }
 
 void CALL HGE_Impl::Gfx_RenderLine(float x1, float y1, float x2, float y2, DWORD color, float z)
 {
-	if(CurPrimType!=HGEPRIM_LINES || nPrim>=VERTEX_BUFFER_SIZE/HGEPRIM_LINES || CurTexture || CurBlendMode!=BLEND_DEFAULT)
+	if(VertArray)
 	{
-		_render_batch();
+		if(CurPrimType!=HGEPRIM_LINES || nPrim>=VERTEX_BUFFER_SIZE/HGEPRIM_LINES || CurTexture || CurBlendMode!=BLEND_DEFAULT)
+		{
+			_render_batch();
 
-		CurPrimType=HGEPRIM_LINES;
-		if(CurBlendMode != BLEND_DEFAULT) _SetBlendMode(BLEND_DEFAULT);
-		if(CurTexture) { pD3DDevice->SetTexture(0, 0); CurTexture=0; }
+			CurPrimType=HGEPRIM_LINES;
+			if(CurBlendMode != BLEND_DEFAULT) _SetBlendMode(BLEND_DEFAULT);
+			if(CurTexture) { pD3DDevice->SetTexture(0, 0); CurTexture=0; }
+		}
+
+		int i=nPrim*HGEPRIM_LINES;
+		VertArray[i].x = x1; VertArray[i+1].x = x2;
+		VertArray[i].y = y1; VertArray[i+1].y = y2;
+		VertArray[i].z     = VertArray[i+1].z = z;
+		VertArray[i].col   = VertArray[i+1].col = color;
+		VertArray[i].tx    = VertArray[i+1].tx =
+		VertArray[i].ty    = VertArray[i+1].ty = 0.0f;
+
+		nPrim++;
 	}
-
-	int i=nPrim*HGEPRIM_LINES;
-	VertArray[i].x = x1; VertArray[i+1].x = x2;
-	VertArray[i].y = y1; VertArray[i+1].y = y2;
-	VertArray[i].z     = VertArray[i+1].z = z;
-	VertArray[i].col   = VertArray[i+1].col = color;
-	VertArray[i].tx    = VertArray[i+1].tx =
-	VertArray[i].ty    = VertArray[i+1].ty = 0.0f;
-
-	nPrim++;
 }
 
 void CALL HGE_Impl::Gfx_RenderTriple(const hgeTriple *triple)
 {
-	if(CurPrimType!=HGEPRIM_TRIPLES || nPrim>=VERTEX_BUFFER_SIZE/HGEPRIM_TRIPLES || CurTexture!=triple->tex || CurBlendMode!=triple->blend)
+	if(VertArray)
 	{
-		_render_batch();
+		if(CurPrimType!=HGEPRIM_TRIPLES || nPrim>=VERTEX_BUFFER_SIZE/HGEPRIM_TRIPLES || CurTexture!=triple->tex || CurBlendMode!=triple->blend)
+		{
+			_render_batch();
 
-		CurPrimType=HGEPRIM_TRIPLES;
-		if(CurBlendMode != triple->blend) _SetBlendMode(triple->blend);
-		if(triple->tex != CurTexture) {
-			pD3DDevice->SetTexture( 0, (LPDIRECT3DTEXTURE8)triple->tex );
-			CurTexture = triple->tex;
+			CurPrimType=HGEPRIM_TRIPLES;
+			if(CurBlendMode != triple->blend) _SetBlendMode(triple->blend);
+			if(triple->tex != CurTexture) {
+				pD3DDevice->SetTexture( 0, (LPDIRECT3DTEXTURE8)triple->tex );
+				CurTexture = triple->tex;
+			}
 		}
-	}
 
-	memcpy(&VertArray[nPrim*HGEPRIM_TRIPLES], triple->v, sizeof(hgeVertex)*HGEPRIM_TRIPLES);
-	nPrim++;
+		memcpy(&VertArray[nPrim*HGEPRIM_TRIPLES], triple->v, sizeof(hgeVertex)*HGEPRIM_TRIPLES);
+		nPrim++;
+	}
 }
 
 void CALL HGE_Impl::Gfx_RenderQuad(const hgeQuad *quad)
 {
-	if(CurPrimType!=HGEPRIM_QUADS || nPrim>=VERTEX_BUFFER_SIZE/HGEPRIM_QUADS || CurTexture!=quad->tex || CurBlendMode!=quad->blend)
+	if(VertArray)
 	{
-		_render_batch();
+		if(CurPrimType!=HGEPRIM_QUADS || nPrim>=VERTEX_BUFFER_SIZE/HGEPRIM_QUADS || CurTexture!=quad->tex || CurBlendMode!=quad->blend)
+		{
+			_render_batch();
 
-		CurPrimType=HGEPRIM_QUADS;
-		if(CurBlendMode != quad->blend) _SetBlendMode(quad->blend);
-		if(quad->tex != CurTexture) {
-			pD3DDevice->SetTexture( 0, (LPDIRECT3DTEXTURE8)quad->tex );
-			CurTexture = quad->tex;
+			CurPrimType=HGEPRIM_QUADS;
+			if(CurBlendMode != quad->blend) _SetBlendMode(quad->blend);
+			if(quad->tex != CurTexture)
+			{
+				pD3DDevice->SetTexture( 0, (LPDIRECT3DTEXTURE8)quad->tex );
+				CurTexture = quad->tex;
+			}
 		}
-	}
 
-	memcpy(&VertArray[nPrim*HGEPRIM_QUADS], quad->v, sizeof(hgeVertex)*HGEPRIM_QUADS);
-	nPrim++;
+		memcpy(&VertArray[nPrim*HGEPRIM_QUADS], quad->v, sizeof(hgeVertex)*HGEPRIM_QUADS);
+		nPrim++;
+	}
 }
 
 hgeVertex* CALL HGE_Impl::Gfx_StartBatch(int prim_type, HTEXTURE tex, int blend, int *max_prim)
 {
-	_render_batch();
-
-	CurPrimType=prim_type;
-	if(CurBlendMode != blend) _SetBlendMode(blend);
-	if(tex != CurTexture)
+	if(VertArray)
 	{
-		pD3DDevice->SetTexture( 0, (LPDIRECT3DTEXTURE8)tex );
-		CurTexture = tex;
-	}
+		_render_batch();
 
-	*max_prim=VERTEX_BUFFER_SIZE / prim_type;
-	return VertArray;
+		CurPrimType=prim_type;
+		if(CurBlendMode != blend) _SetBlendMode(blend);
+		if(tex != CurTexture)
+		{
+			pD3DDevice->SetTexture( 0, (LPDIRECT3DTEXTURE8)tex );
+			CurTexture = tex;
+		}
+
+		*max_prim=VERTEX_BUFFER_SIZE / prim_type;
+		return VertArray;
+	}
+	else return 0;
 }
 
 void CALL HGE_Impl::Gfx_FinishBatch(int nprim)
@@ -265,7 +285,7 @@ HTARGET CALL HGE_Impl::Target_Create(int width, int height, bool zbuffer)
 
 	if(zbuffer)
 	{
-		if(FAILED(pD3DDevice->CreateDepthStencilSurface(width, height,
+		if(FAILED(pD3DDevice->CreateDepthStencilSurface(pTarget->width, pTarget->height,
 						D3DFMT_D16, D3DMULTISAMPLE_NONE, &pTarget->pDepth)))
 		{   
 			pTarget->pTex->Release();
@@ -289,15 +309,20 @@ void CALL HGE_Impl::Target_Free(HTARGET target)
 	{
 		if((CRenderTargetList *)target == pTarget)
 		{
-			if(pPrevTarget) pPrevTarget->next = pTarget->next;
-			else pTargets = pTarget->next;
+			if(pPrevTarget)
+				pPrevTarget->next = pTarget->next;
+			else
+				pTargets = pTarget->next;
+
 			if(pTarget->pTex) pTarget->pTex->Release();
 			if(pTarget->pDepth) pTarget->pDepth->Release();
+
 			delete pTarget;
 			return;
 		}
-		pPrevTarget=pTarget;
-		pTarget=pTarget->next;
+
+		pPrevTarget = pTarget;
+		pTarget = pTarget->next;
 	}
 }
 
@@ -506,26 +531,33 @@ void CALL HGE_Impl::Texture_Unlock(HTEXTURE tex)
 
 void HGE_Impl::_render_batch(bool bEndScene)
 {
-	if(!nPrim) return;
-	pVB->Unlock();
-
-	switch(CurPrimType)
+	if(VertArray)
 	{
-		case HGEPRIM_QUADS:
-			pD3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, nPrim<<2, 0, nPrim<<1);
-			break;
+		pVB->Unlock();
+		
+		if(nPrim)
+		{
+			switch(CurPrimType)
+			{
+				case HGEPRIM_QUADS:
+					pD3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, nPrim<<2, 0, nPrim<<1);
+					break;
 
-		case HGEPRIM_TRIPLES:
-			pD3DDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, nPrim);
-			break;
+				case HGEPRIM_TRIPLES:
+					pD3DDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, nPrim);
+					break;
 
-		case HGEPRIM_LINES:
-			pD3DDevice->DrawPrimitive(D3DPT_LINELIST, 0, nPrim);
-			break;
+				case HGEPRIM_LINES:
+					pD3DDevice->DrawPrimitive(D3DPT_LINELIST, 0, nPrim);
+					break;
+			}
+
+			nPrim=0;
+		}
+
+		if(bEndScene) VertArray = 0;
+		else pVB->Lock( 0, 0, (BYTE**)&VertArray, 0 );
 	}
-
-	nPrim=0;
-	if(!bEndScene) pVB->Lock( 0, 0, (BYTE**)&VertArray, 0 );
 }
 
 void HGE_Impl::_SetBlendMode(int blend)
@@ -619,12 +651,15 @@ bool HGE_Impl::_GfxInit()
 // Set up Full Screen presentation parameters
 
 	nModes=pD3D->GetAdapterModeCount(D3DADAPTER_DEFAULT);
-	for(i=0; i<nModes; i++) {
+
+	for(i=0; i<nModes; i++)
+	{
 		pD3D->EnumAdapterModes(D3DADAPTER_DEFAULT, i, &Mode);
 		if(Mode.Width != (UINT)nScreenWidth || Mode.Height != (UINT)nScreenHeight) continue;
 		if(nScreenBPP==16 && (_format_id(Mode.Format) > _format_id(D3DFMT_A1R5G5B5))) continue;
 		if(_format_id(Mode.Format) > _format_id(Format)) Format=Mode.Format;
 	}
+
 	if(Format == D3DFMT_UNKNOWN)
 	{
 		_PostError("Can't find appropriate full screen video mode");
@@ -643,6 +678,7 @@ bool HGE_Impl::_GfxInit()
 
 	d3dppFS.SwapEffect       = D3DSWAPEFFECT_FLIP;
 	d3dppFS.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
+
 	if(nHGEFPS==HGEFPS_VSYNC) d3dppFS.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_ONE;
 	else					  d3dppFS.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
 
@@ -652,8 +688,7 @@ bool HGE_Impl::_GfxInit()
 		d3dppFS.AutoDepthStencilFormat = D3DFMT_D16;
 	}
 
-	if(bWindowed) d3dpp=&d3dppW;
-	else d3dpp=&d3dppFS;
+	d3dpp = bWindowed ? &d3dppW : &d3dppFS;
 
 	if(_format_id(d3dpp->BackBufferFormat) < 4) nScreenBPP=16;
 	else nScreenBPP=32;
@@ -662,12 +697,14 @@ bool HGE_Impl::_GfxInit()
 
 	if( FAILED( pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hwnd,
                                   D3DCREATE_SOFTWARE_VERTEXPROCESSING,
-                                  d3dpp, &pD3DDevice ) ) ) {
+                                  d3dpp, &pD3DDevice ) ) )
+	{
 		_PostError("Can't create D3D device");
 		return false;
 	}
 
 	_AdjustWindow();
+
 	System_Log("Mode: %d x %d x %s\n",nScreenWidth,nScreenHeight,szFormats[_format_id(Format)]);
 
 // Create vertex batch buffer
@@ -725,7 +762,7 @@ void HGE_Impl::_Resize(int width, int height)
 {
 	if(hwndParent)
 	{
-		if(procFocusLostFunc) procFocusLostFunc();
+		//if(procFocusLostFunc) procFocusLostFunc();
 
 		d3dppW.BackBufferWidth=width;
 		d3dppW.BackBufferHeight=height;
@@ -735,7 +772,7 @@ void HGE_Impl::_Resize(int width, int height)
 		_SetProjectionMatrix(nScreenWidth, nScreenHeight);
 		_GfxRestore();
 
-		if(procFocusGainFunc) procFocusGainFunc();
+		//if(procFocusGainFunc) procFocusGainFunc();
 	}
 }
 
@@ -776,12 +813,12 @@ void HGE_Impl::_GfxDone()
 }
 
 
-void HGE_Impl::_GfxRestore()
+bool HGE_Impl::_GfxRestore()
 {
 	CRenderTargetList *target=pTargets;
 
-	if(!pD3DDevice) return;
-	if(pD3DDevice->TestCooperativeLevel() != D3DERR_DEVICENOTRESET) return;
+	//if(!pD3DDevice) return false;
+	//if(pD3DDevice->TestCooperativeLevel() == D3DERR_DEVICELOST) return;
 
 	if(pScreenSurf) pScreenSurf->Release();
 	if(pScreenDepth) pScreenDepth->Release();
@@ -805,7 +842,12 @@ void HGE_Impl::_GfxRestore()
 	}
 
 	pD3DDevice->Reset(d3dpp);
-	_init_lost();
+
+	if(!_init_lost()) return false;
+
+	if(procGfxRestoreFunc) return procGfxRestoreFunc();
+
+	return true;
 }
 
 
@@ -823,10 +865,12 @@ bool HGE_Impl::_init_lost()
 	
 	while(target)
 	{
-		if(target->pTex) D3DXCreateTexture(pD3DDevice, target->width, target->height, 1, D3DUSAGE_RENDERTARGET,
-						 d3dpp->BackBufferFormat, D3DPOOL_DEFAULT, &target->pTex);
-		if(target->pDepth) pD3DDevice->CreateDepthStencilSurface(target->width, target->height,
-						   D3DFMT_D16, D3DMULTISAMPLE_NONE, &target->pDepth);
+		if(target->pTex)
+			D3DXCreateTexture(pD3DDevice, target->width, target->height, 1, D3DUSAGE_RENDERTARGET,
+							  d3dpp->BackBufferFormat, D3DPOOL_DEFAULT, &target->pTex);
+		if(target->pDepth)
+			pD3DDevice->CreateDepthStencilSurface(target->width, target->height,
+												  D3DFMT_D16, D3DMULTISAMPLE_NONE, &target->pDepth);
 		target=target->next;
 	}
 

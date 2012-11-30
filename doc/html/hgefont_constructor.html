@@ -18,21 +18,20 @@
 <table width=566 cellspacing=0 cellpadding=20 border=0><tr><td>
 <h1 style="margin-top:0px">hgeFont Constructors</h1>
 <p>
-To create and initalize a <b>hgeFont</b> object you may use one of these constructors:
+To create and initalize a <b>hgeFont</b> object use the constructor:
 </p>
 <pre>
 hgeFont(
-  const char *<i><b>filename</b></i>
-);
-
-hgeFont(
-  const hgeFont &<i><b>font</b></i>
+  const char *<i><b>filename</b></i>,
+  bool <i><b>bMipmap</b></i> = false
 );
 </pre>
 <h2>Parameters</h2>
 <dl>
 <dt><i>filename</i>
 <dd>Font description file name.
+<dt><i>bMipmap</i>
+<dd>If <b>true</b>, a set of mipmap levels is automatically created and used for font texture.
 </dl>
 <h2>Remarks</h2>
 <p>

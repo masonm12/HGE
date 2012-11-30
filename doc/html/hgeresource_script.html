@@ -60,6 +60,34 @@ If <a href="hgeresource__main.html">hgeResourceManager</a> encounters problem
 reading script, it tries to skip the smallest possible part and continue parsing.
 All the parsing errors are written to the log file in the most meaningful way possible.
 </p>
+<h2>Quick reference</h2>
+<p>
+<table width=100%>
+<tr>
+<td>
+<a href="#include">Include</a><br>
+<a href="#resource">Resource</a><br>
+<a href="#texture">Texture</a><br>
+</td>
+<td>
+<a href="#sound">Sound</a><br>
+<a href="#music">Music</a><br>
+<a href="#stream">Stream</a><br>
+</td>
+<td>
+<a href="#target">Target</a><br>
+<a href="#sprite">Sprite</a><br>
+<a href="#animation">Animation</a><br>
+</td>
+<td>
+<a href="#font">Font</a><br>
+<a href="#particle">Particle</a><br>
+<a href="#distortion">Distortion</a><br>
+</td>
+</tr>
+</table>
+</p>
+<a name="include"></a>
 <h2>Include</h2>
 <p>
 Command "Include" includes another script file into processing.
@@ -72,6 +100,7 @@ Example:
 <pre>
 Include level2.res
 </pre>
+<a name="resource"></a>
 <h2>Resource</h2>
 <p>
 Command "Resource" defines a raw resource. Supported parameters:
@@ -92,6 +121,7 @@ Resource level1
  resgroup=1
 }
 </pre>
+<a name="texture"></a>
 <h2>Texture</h2>
 <p>
 Command "Texture" defines a texture. Supported parameters:
@@ -99,6 +129,8 @@ Command "Texture" defines a texture. Supported parameters:
 <dl>
 <dt>filename
 <dd>Texture filename, either absolute or relative to the application folder or resource package root.
+<dt>mipmap 
+<dd>If "<b>true</b>", a set of mipmap levels will be created and used for the texture. 
 <dt>resgroup
 <dd>Integer resource group identificator. Default is 0, meaning no specific group.
 </dl>
@@ -112,6 +144,7 @@ Texture background
  resgroup=1
 }
 </pre>
+<a name="sound"></a>
 <h2>Sound</h2>
 <p>
 Command "Sound" defines a sound effect. Supported parameters:
@@ -132,6 +165,7 @@ Sound explosion1
  resgroup=1
 }
 </pre>
+<a name="music"></a>
 <h2>Music</h2>
 <p>
 Command "Music" defines a music. Supported parameters:
@@ -139,6 +173,8 @@ Command "Music" defines a music. Supported parameters:
 <dl>
 <dt>filename
 <dd>Music filename, either absolute or relative to the application folder or resource package root.
+<dt>amplify
+<dd>Level of amplification for the music. Default is 50.
 <dt>resgroup
 <dd>Integer resource group identificator. Default is 0, meaning no specific group.
 </dl>
@@ -149,9 +185,11 @@ Example:
 Music main_theme
 {
  filename=sounds\music1.xm
+ amplify=70
  resgroup=1
 }
 </pre>
+<a name="stream"></a>
 <h2>Stream</h2>
 <p>
 Command "Stream" defines an audio stream. Supported parameters:
@@ -172,6 +210,7 @@ Stream sountrack1
  resgroup=1
 }
 </pre>
+<a name="target"></a>
 <h2>Target</h2>
 <p>
 Command "Target" defines a render target. Supported parameters:
@@ -196,6 +235,7 @@ Target HUD
  resgroup=1
 }
 </pre>
+<a name="sprite"></a>
 <h2>Sprite</h2>
 <p>
 Command "Sprite" defines a sprite. Supported parameters:
@@ -245,6 +285,7 @@ Sprite orc : wizard
  color=FF808000
 }
 </pre>
+<a name="animation"></a>
 <h2>Animation</h2>
 <p>
 Command "Animation" defines an animation. It supports all the
@@ -277,6 +318,7 @@ Animation hero.walk
  resgroup=1
 }
 </pre>
+<a name="font"></a>
 <h2>Font</h2>
 <p>
 Command "Font" defines a font. Supported parameters:
@@ -284,6 +326,8 @@ Command "Font" defines a font. Supported parameters:
 <dl>
 <dt>filename
 <dd><a href="hgefont_description.html">Font description file</a> name relative to the application folder or resource package root.
+<dt>mipmap
+<dd>If "<b>true</b>", a set of mipmap levels will be created and used for font texture.
 <dt>blendmode
 <dd>The font blending mode, list of one or more of the following constants:
 <b>COLORMUL</b>, <b>COLORADD</b>, <b>ALPHABLEND</b>, <b>ALPHAADD</b>,
@@ -296,6 +340,8 @@ The default value is FFFFFFFF.
 <dd>The font Z-order: a float value. The default value is 0.5.
 <dt>scale
 <dd>The font scaling, a float value. Default is 1.0.
+<dt>proportion
+<dd>The font proportion, a float value. Default is 1.0.
 <dt>rotation
 <dd>The letters rotation in radians, a float value. Default is 0.0.
 <dt>tracking
@@ -316,6 +362,7 @@ Font tengwar
  resgroup=1
 }
 </pre>
+<a name="particle"></a>
 <h2>Particle</h2>
 <p>
 Command "Particle" defines a particle system. Supported parameters:
@@ -325,9 +372,6 @@ Command "Particle" defines a particle system. Supported parameters:
 <dd><a href="peditor_presets.html">Particle system preset</a> filename relative to the application folder or resource package root.
 <dt>sprite
 <dd>The sprite name to use for the particle system.
-<dt>fps
-<dd>The particle system update rate in frames per second, a float value. Default is 0.0,
-meaning unlimited.
 <dt>resgroup
 <dd>Integer resource group identificator. Default is 0, meaning no specific group.
 </dl>
@@ -339,10 +383,10 @@ Particle explosion1
 {
  filename=data\explosion1.psi
  sprite=explosion1
- fps=50.0
  resgroup=1
 }
 </pre>
+<a name="distortion"></a>
 <h2>Distortion</h2>
 <p>
 Command "Distortion" defines a distortion mesh. Supported parameters:

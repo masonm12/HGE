@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.6
-** Copyright (C) 2003-2006, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** hgeStringTable helper class implementation
@@ -55,6 +55,14 @@ hgeStringTable::hgeStringTable(const char *filename)
 		// skip whitespaces
 		while(isspace(*pdesc)) pdesc++;
 		if(!*pdesc) break;
+
+		// skip comments
+		if(*pdesc==';')
+		{
+			while(*pdesc && *pdesc != '\n') pdesc++;
+			pdesc++;
+			continue;
+		}
 
 		// get string name -> str_name
 		i=0;

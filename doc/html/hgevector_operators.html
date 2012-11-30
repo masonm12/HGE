@@ -21,18 +21,19 @@
 The following operators are defined for <b>hgeVector</b> class:
 <p>
 <pre>
+hgeVector   operator-  ();
 hgeVector   operator-  (const hgeVector &v);
 hgeVector   operator+  (const hgeVector &v);
-hgeVector   operator*  (float scalar);
-hgeVector   operator-  ();
-
-hgeVector&  operator=  (const hgeVector &v);
 hgeVector&  operator-= (const hgeVector &v);
 hgeVector&  operator+= (const hgeVector &v);
-hgeVector&  operator*= (float scalar);
-
 bool        operator== (const hgeVector &v);
 bool        operator!= (const hgeVector &v);
+
+hgeVector   operator/  (float scalar);
+hgeVector   operator*  (float scalar);
+hgeVector&  operator*= (float scalar);
+
+hgeVector&  operator=  (const hgeVector &v);
 
 float       operator^  (const hgeVector &v, const hgeVector &u);
 float       operator%  (const hgeVector &v, const hgeVector &u);

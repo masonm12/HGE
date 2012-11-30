@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.5
-** Copyright (C) 2003-2004, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** Resource script parser implementation
@@ -44,6 +44,8 @@ keyword keytable[]=
 
 	{ "filename",	TTPAR_FILENAME	},
 	{ "resgroup",	TTPAR_RESGROUP	},
+	{ "mipmap",		TTPAR_MIPMAP	},
+	{ "amplify",	TTPAR_AMPLIFY	},
 	{ "size",		TTPAR_SIZE		},
 	{ "zbuffer",	TTPAR_ZBUFFER	},
 	{ "texture",	TTPAR_TEXTURE	},
@@ -54,6 +56,7 @@ keyword keytable[]=
 	{ "zorder",		TTPAR_ZORDER	},
 	{ "flip",		TTPAR_FLIP		},
 	{ "scale",		TTPAR_SCALE		},
+	{ "proportion",	TTPAR_PROPORTION},
 	{ "rotation",	TTPAR_ROTATION	},
 	{ "frames",		TTPAR_FRAMES	},
 	{ "fps",		TTPAR_FPS		},
@@ -121,6 +124,16 @@ int RScriptParser::get_token()
 		tokentype=TTNUMBER;
 		for(i=0;(*script>='0' && *script<='9') || *script=='.' || *script=='-';i++)
 			 tokenvalue[i]=*script++;
+
+		// Hexadecimal number starting with decimal digit
+
+		if((*script>='A' && *script<='F') || (*script>='a' && *script<='f'))
+		{
+			tokentype=TTSTRING;
+			for(; (*script>='A' && *script<='F') || (*script>='a' && *script<='f') ; i++)
+				 tokenvalue[i]=*script++;
+		}
+
 		tokenvalue[i]=0;
 		return tokentype;
 	}
@@ -149,7 +162,7 @@ int RScriptParser::get_token()
 			return tokentype;
 		}
 
-	// Unquoted string
+	// Unquoted string or hexadecimal number
 
 	tokentype=TTSTRING;
 	for(i=0;

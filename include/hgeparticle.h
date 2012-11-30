@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.5
-** Copyright (C) 2003-2004, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** hgeParticleSystem helper class header
@@ -87,8 +87,8 @@ class hgeParticleSystem
 public:
 	hgeParticleSystemInfo info;
 	
-	hgeParticleSystem(const char *filename, hgeSprite *sprite, float fps=0.0f);
-	hgeParticleSystem(hgeParticleSystemInfo *psi, float fps=0.0f);
+	hgeParticleSystem(const char *filename, hgeSprite *sprite);
+	hgeParticleSystem(hgeParticleSystemInfo *psi);
 	hgeParticleSystem(const hgeParticleSystem &ps);
 	~hgeParticleSystem() { hge->Release(); }
 
@@ -112,12 +112,8 @@ public:
 
 private:
 	hgeParticleSystem();
-	void				_update(float fDeltaTime);
 
 	static HGE			*hge;
-
-	float				fUpdSpeed;
-	float				fResidue;
 
 	float				fAge;
 	float				fEmissionResidue;
@@ -136,7 +132,7 @@ private:
 class hgeParticleManager
 {
 public:
-	hgeParticleManager(float fps=0.0f);
+	hgeParticleManager();
 	~hgeParticleManager();
 
 	void				Update(float dt);
@@ -153,7 +149,6 @@ private:
 	hgeParticleManager(const hgeParticleManager &);
 	hgeParticleManager&	operator= (const hgeParticleManager &);
 
-	float				fFPS;
 	int					nPS;
 	float				tX;
 	float				tY;

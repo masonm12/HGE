@@ -22,7 +22,7 @@ Builds absolute file path.
 </p>
 <pre>
 char *Resource_MakePath(
-  const char *<i><b>filename</b></i>
+  const char *<i><b>filename</b></i> = 0
 );
 </pre>
 <h2>Parameters</h2>
@@ -35,8 +35,8 @@ char *Resource_MakePath(
 If <b>filename</b> is relative, treats it relative to the application folder and
 returns pointer to the full file path from disk root.
 If <b>filename</b> is absolute, copies it into temporary buffer and returns
-pointer to this buffer. If <b>filename</b> =0, returns absolute path to the application
-folder with trailing '\'.
+pointer to this buffer. If <b>filename</b> =0 or omitted, returns absolute path
+to the application folder with trailing '\'.
 </p>
 <h2>Requirements</h2>
 <p>

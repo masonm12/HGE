@@ -44,8 +44,8 @@ hgeVertex *Gfx_StartBatch(
 </dl>
 <h2>Return value</h2>
 <p>
-Returns pointer to vertex buffer to be filled with vertices and stores the maximum allowed number
-of primitives into <b>max_prim</b>.
+If successful, returns pointer to the vertex buffer to be filled with vertices and stores the maximum allowed number
+of primitives into <b>max_prim</b>. Otherwise returns 0.
 </p>
 <h2>Remarks</h2>
 <p>
@@ -56,12 +56,12 @@ or complex precalculated objects rendering.
 <br><br>
 <b>Gfx_StartBatch</b> function must be called between the <a href="hgefunc_gfxbeginscene.html">Gfx_BeginScene</a>
 and <a href="hgefunc_gfxendscene.html">Gfx_EndScene</a> calls. To finish a batch use 
-<a href="hgedata_gfxfinishbatch.html">Gfx_FinishBatch</a> function. No other rendering functions
+<a href="hgefunc_gfxfinishbatch.html">Gfx_FinishBatch</a> function. No other rendering functions
 are allowed inside <b>Gfx_StartBatch</b>/<b>Gfx_FinishBatch</b> calls pair.
 <br><br>
 Vertex buffer size is constant and unlikely to change. It can hold up to 1000 quads / 1333 triples /
 2000 lines. You should write to the buffer 2 vertices per line, 3 vertices per triple or 4 vertices per quad.
-The actual number of primitives written to the buffer should be passed to <a href="hgedata_gfxfinishbatch.html">Gfx_FinishBatch</a>.
+The actual number of primitives written to the buffer should be passed to <a href="hgefunc_gfxfinishbatch.html">Gfx_FinishBatch</a>.
 <br><br>
 <b>Gfx_StartBatch</b> flushes all previously accumulated graphic primitives.
 </p>

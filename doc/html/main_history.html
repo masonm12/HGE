@@ -17,6 +17,56 @@
 <td valign=top>
 <table width=566 cellspacing=0 cellpadding=20 border=0><tr><td>
 <h1 style="margin-top:0px">Version history</h1>
+<h2>Version 1.7, 30 May 2007</h2>
+<ul>
+<li><a href="hgeconst_systemstate.html#HGE_SHOWSPLASH">HGE_SHOWSPLASH</a> system state added instead of earlier hack with <b>(hgeIntState)14</b>
+<li><a href="hgefunc_timergetfps.html">Timer_GetFPS</a> now returns more precise value
+<li><a href="hgefunc_inputgetkeystate.html">Input_GetKeyState</a> now correctly handles swapped mouse buttons
+<li><a href="hgefunc_inputgetmousepos.html">Input_GetMousePos</a> now returns correct values before call to <a href="hgefunc_systemstart.html">System_Start</a>
+<li><a href="hgefunc_inputkeydown.html">Input_KeyDown</a> and <a href="hgefunc_inputkeyup.html">Input_KeyUp</a> were added
+<li><a href="hgefunc_systemlog.html">System_Log</a> now accepts strings of unlimited length
+<li><a href="hgefunc_resourcemakepath.html">Resource_MakePath</a> can now be called without argument
+<li>Several potential vulnerabilities in internal rendering pipeline were fixed
+<li><a href="hgefunc_gfxsetclipping.html">Gfx_SetClipping</a> now works correctly
+<li><a href="hgefunc_gfxstartbatch.html">Gfx_StartBatch</a> can now fail and return 0 under some conditions, be aware
+<li>Changing <a href="hgeconst_systemstate.html#HGE_WINDOWED">HGE_WINDOWED</a> system state on the fly (windowed/fullscreen toggle) now works correctly.
+<li>Pressing <b>Alt+ENTER</b> now toggles windowed/fullscreen mode
+<li><a href="hgeconst_systemstate.html#HGE_FOCUSGAINFUNC">HGE_FOCUSGAINFUNC</a> now should NOT be used to restore lost render targets. Use <a href="hgeconst_systemstate.html#HGE_GFXRESTOREFUNC">HGE_GFXRESTOREFUNC</a> instead.
+<li>Updated to <b>BASS 2.3</b>
+<li><a href="hgefunc_channelpauseall.html">Channel_PauseAll</a> and <a href="hgefunc_channelresumeall.html">Channel_ResumeAll</a> were added
+<li><a href="hgefunc_channelslideto.html">Channel_SlideTo</a> and <a href="hgefunc_channelissliding.html">Channel_IsSliding</a> were added
+<li>Music playback now correctly handles modules that require "ramping"
+<li><a href="hgefunc_musicplay.html">Music_Play</a> now has many additional, optional parameters
+<li><a href="hgefunc_musicgetlength.html">Music_GetLength</a>, <a href="hgefunc_musicsetpos.html">Music_SetPos</a> and <a href="hgefunc_musicgetpos.html">Music_GetPos</a> were added
+<li><a href="hgefunc_musicsetinstrvolume.html">Music_SetInstrVolume</a>, <a href="hgefunc_musicgetinstrvolume.html">Music_GetInstrVolume</a>, <a href="hgefunc_musicsetchannelvolume.html">Music_SetChannelVolume</a> and <a href="hgefunc_musicgetchannelvolume.html">Music_GetChannelVolume</a> were added
+<li><a href="hgefunc_musicsetamplification.html">Music_SetAmplification</a> and <a href="hgefunc_musicgetamplification.html">Music_GetAmplification</a> were added. <a href="hgeresource_script.html#music">Music resource</a> has new <b>amplify</b> parameter in resource script
+<li><a href="hgevector_clamp.html">hgeVector::Clamp</a> method added
+<li><a href="hgevector_operators.html">hgeVector::operator/ (float)</a> added, some operators made <b>const</b>
+<li><a href="hgecolor__main.html">hgeColor</a> is now an alias for <a href="hgecolorrgb__main.html">hgeColorRGB</a> class
+<li>Some <a href="hgecolorrgb_operators.html">hgeColorRGB operators</a> made <b>const</b>
+<li>New <a href="hgecolorrgb_operators.html">hgeColorRGB operators</a>: hgeColorRGB * hgeColorRGB and hgeColorRGB / float
+<li><a href="hgecolorhsv__main.html">hgeColorHSV</a> class added
+<li><a href="hgesprite_getwidth.html">hgeSprite::GetWidth</a> and <a href="hgesprite_getheight.html">hgeSprite::GetHeight</a> were added
+<li><a href="hgesprite_settexturerect.html">hgeSprite::SetTextureRect</a> now has additional <b>adjSize</b> parameter
+<li><a href="hgesprite_setflip.html">hgeSprite::SetFlip</a> now has additional <b>bHotSpot</b> parameter
+<li><a href="hgeanim__main.html">hgeAnimation</a> now looks for frames within original texture dimensions, not within dimensions of loaded into video memory texture as earlier
+<li><a href="hgegui_guilistbox.html">hgeGUIListbox</a> Render method is fixed (had potential crash)
+<li><a href="hgeresource_script.html#texture">Texture resource</a> has new <b>mipmap</b> parameter in resource script
+<li><a href="hgefont_constructor.html">hgeFont constructor</a> has new optional <b>bMipmap</b> parameter, <a href="hgeresource_script.html#font">Font resource</a> has new <b>mipmap</b> parameter in resource script
+<li><a href="hgefont__main.html">hgeFont</a> copy constructor and assignment operator were removed and made private
+<li><a href="hgefont__main.html">hgeFont</a> was not parsing the last line of a font file. Fixed.
+<li><a href="hgefont_setproportion.html">hgeFont::SetProportion</a> and <a href="hgefont_getproportion.html">hgeFont::GetProportion</a> were added. <a href="hgeresource_script.html#font">Font resource</a> has new <b>proportion</b> parameter in resource script
+<li><a href="hgefont_printf.html">hgeFont::printf</a> and <a href="hgefont_printfb.html">hgeFont::printfb</a> now have buffer overrun protection
+<li><a href="hgefont_getstringwidth.html">hgeFont::GetStringWidth</a> were checking only the first line of the string. Fixed.
+<li><a href="hgestring_script.html">String Table File</a> now supports comments (start them with ";")
+<li>New <a href="hgegui__main.html">hgeGUI</a> methods: <a href="hgegui_move.html">Move</a>, <a href="hgegui_reset.html">Reset</a>, <a href="hgegui_setcolor.html">SetColor</a>
+<li>New <a href="hgeguio__main.html">hgeGUIObject</a> methods: <a href="hgeguio_setcolor.html">SetColor</a>, <a href="hgeguio_reset.html">Reset</a>. And new <a href="hgeguio_datamembers.html">data member</a>: <b>color</b>
+<li><a href="hgeparticle__main.html">hgeParticleSystem</a> is now completely FPS-independent. Thus FPS arguments were removed from all it's constructors, resource script and editor INI-file. See <a href="main_upgrade.html">Upgrading from older HGE</a> for details.
+<li><a href="peditor__main.html">Particle Systems Editor</a> now supports background image via <a href="peditor_ini.html">it's INI-file</a>. Also, you may now hide the interface with the TAB key and run particle preset with the SPACE key.
+<li><a href="hgeresource__main.html">hgeResourceManager</a> now correctly parses hexadecimal values starting with decimal digit.
+<li><a href="pngopt__main.html">PNG Optimizer</a> tool added
+</ul>
+
 <h2>Version 1.6, 30 August 2006</h2>
 <ul>
 <li><a href="hgefunc_textureload.html">Texture_Load</a> now has optional third parameter allowing to use automatic mipmapping
@@ -76,7 +126,7 @@
 <li><a href="hgeconst_systemstate.html#HGE_TEXTUREFILTER">HGE_TEXTUREFILTER</a> system state added, allowing you to temporarily disable texture interpolation
 <li>In fullscreen mode <b>HGE</b> window now has "topmost" style
 <li>Fixed a bug in textures cleanup code
-<li>Fixed a bug in <a href="hgecolor_clamp.html">hgeColor::Clamp</a> method
+<li>Fixed a bug in <a href="hgecolorrgb_clamp.html">hgeColorRGB::Clamp</a> method
 <li>Minor documentation updates
 <li>New <a href="tutorials_tut08.html">tutorial/demo</a> added
 </ul>

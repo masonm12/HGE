@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.6
-** Copyright (C) 2003-2006, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** hge_tut04 - Using render targets
@@ -47,12 +47,11 @@ void boom() {
 	hge->Effect_PlayEx(snd,100,pan,pitch);
 }
 
-// This function will be called by HGE
-// when the application receives focus.
-// We use it here to update the render
-// target's texture handle that may change
-// when the focus is lost.
-bool FocusGainFunc()
+// This function will be called by HGE when
+// render targets were lost and have been just created
+// again. We use it here to update the render
+// target's texture handle that changes during recreation.
+bool GfxRestoreFunc()
 {
 	if(tar && target) tar->SetTexture(hge->Target_GetTexture(target));
 	return false;
@@ -119,7 +118,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	hge->System_SetState(HGE_LOGFILE, "hge_tut04.log");
 	hge->System_SetState(HGE_FRAMEFUNC, FrameFunc);
 	hge->System_SetState(HGE_RENDERFUNC, RenderFunc);
-	hge->System_SetState(HGE_FOCUSGAINFUNC, FocusGainFunc);
+	hge->System_SetState(HGE_GFXRESTOREFUNC, GfxRestoreFunc);
 	hge->System_SetState(HGE_TITLE, "HGE Tutorial 04 - Using render targets");
 	hge->System_SetState(HGE_FPS, 100);
 	hge->System_SetState(HGE_WINDOWED, true);

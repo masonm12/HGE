@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.5
-** Copyright (C) 2003-2004, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** hgeParticleSystem helper class implementation
@@ -13,7 +13,7 @@
 HGE	*hgeParticleSystem::hge=0;
 
 
-hgeParticleSystem::hgeParticleSystem(const char *filename, hgeSprite *sprite, float fps)
+hgeParticleSystem::hgeParticleSystem(const char *filename, hgeSprite *sprite)
 {
 	void *psi;
 
@@ -32,15 +32,12 @@ hgeParticleSystem::hgeParticleSystem(const char *filename, hgeSprite *sprite, fl
 	fEmissionResidue=0.0f;
 	nParticlesAlive=0;
 	fAge=-2.0;
-	if(fps!=0.0f) fUpdSpeed=1.0f/fps;
-	else fUpdSpeed=0.0f;
-	fResidue=0.0f;
 
 	rectBoundingBox.Clear();
 	bUpdateBoundingBox=false;
 }
 
-hgeParticleSystem::hgeParticleSystem(hgeParticleSystemInfo *psi, float fps)
+hgeParticleSystem::hgeParticleSystem(hgeParticleSystemInfo *psi)
 {
 	hge=hgeCreate(HGE_VERSION);
 
@@ -53,9 +50,6 @@ hgeParticleSystem::hgeParticleSystem(hgeParticleSystemInfo *psi, float fps)
 	fEmissionResidue=0.0f;
 	nParticlesAlive=0;
 	fAge=-2.0;
-	if(fps!=0.0f) fUpdSpeed=1.0f/fps;
-	else fUpdSpeed=0.0f;
-	fResidue=0.0f;
 
 	rectBoundingBox.Clear();
 	bUpdateBoundingBox=false;
@@ -68,20 +62,6 @@ hgeParticleSystem::hgeParticleSystem(const hgeParticleSystem &ps)
 }
 
 void hgeParticleSystem::Update(float fDeltaTime)
-{
-   if(fUpdSpeed==0.0f) _update(fDeltaTime);
-   else
-   {
-      fResidue+=fDeltaTime;
-      if(fResidue>=fUpdSpeed)
-	  {
-			_update(fUpdSpeed);
-			while(fResidue>=fUpdSpeed) fResidue-=fUpdSpeed;
-	  }
-   }
-}
-
-void hgeParticleSystem::_update(float fDeltaTime)
 {
 	int i;
 	float ang;
@@ -125,7 +105,7 @@ void hgeParticleSystem::_update(float fDeltaTime)
 		par->vecVelocity += (vecAccel+vecAccel2)*fDeltaTime;
 		par->vecVelocity.y += par->fGravity*fDeltaTime;
 
-		par->vecLocation += par->vecVelocity;
+		par->vecLocation += par->vecVelocity*fDeltaTime;
 
 		par->fSpin += par->fSpinDelta*fDeltaTime;
 		par->fSize += par->fSizeDelta*fDeltaTime;
@@ -233,7 +213,6 @@ void hgeParticleSystem::Fire()
 {
 	if(info.fLifetime==-1.0f) fAge=-1.0f;
 	else fAge=0.0f;
-	fResidue=0.0;
 }
 
 void hgeParticleSystem::Stop(bool bKillParticles)

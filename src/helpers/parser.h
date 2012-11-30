@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.5
-** Copyright (C) 2003-2004, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** Resource script parser header
@@ -28,10 +28,10 @@ enum
  TTRES__LAST,
 
  TTPAR__FIRST,
- TTPAR_FILENAME, TTPAR_RESGROUP, TTPAR_SIZE, TTPAR_ZBUFFER, TTPAR_TEXTURE,
- TTPAR_RECT, TTPAR_HOTSPOT, TTPAR_BLENDMODE, TTPAR_COLOR, TTPAR_ZORDER,
- TTPAR_FLIP, TTPAR_SCALE, TTPAR_ROTATION, TTPAR_FRAMES, TTPAR_FPS,
- TTPAR_MODE, TTPAR_TRACKING, TTPAR_SPACING, TTPAR_SPRITE, TTPAR_MESH,
+ TTPAR_FILENAME, TTPAR_RESGROUP, TTPAR_MIPMAP, TTPAR_AMPLIFY, TTPAR_SIZE, TTPAR_ZBUFFER,
+ TTPAR_TEXTURE, TTPAR_RECT, TTPAR_HOTSPOT, TTPAR_BLENDMODE, TTPAR_COLOR,
+ TTPAR_ZORDER, TTPAR_FLIP, TTPAR_SCALE, TTPAR_PROPORTION, TTPAR_ROTATION, TTPAR_FRAMES,
+ TTPAR_FPS, TTPAR_MODE, TTPAR_TRACKING, TTPAR_SPACING, TTPAR_SPRITE, TTPAR_MESH,
  TTPAR__LAST,
 
  TTCON__FIRST,
@@ -56,7 +56,7 @@ public:
 	char*	tkn_string() { return tokenvalue; }
 	int		tkn_int()    { return atoi(tokenvalue); }
 	float	tkn_float()  { return (float)atof(tokenvalue); }
-	bool	tkn_bool()   { return tokenvalue[0]=='t' ? true : false; }
+	bool	tkn_bool()   { return (tokenvalue[0]=='t' || tokenvalue[0]=='T') ? true : false; }
 	DWORD	tkn_hex();
 
 	void	ScriptPostError(char *msg1, char *msg2);

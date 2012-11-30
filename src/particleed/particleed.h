@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.1
-** Copyright (C) 2003, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2007, Relish Games
 ** hge.relishgames.com
 **
 ** Particle systems editor
@@ -34,8 +34,11 @@ struct PEditorState
 {
 	bool				bHelp;
 	bool				bBBox;
+	bool				bIFace;
 	int					nPreset;
 	float				mx, my;
+	HTEXTURE			texBG;
+	hgeSprite			*sprBG;
 	hgeParticleSystem	*ps;
 };
 

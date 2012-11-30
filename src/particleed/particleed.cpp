@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.1
-** Copyright (C) 2003, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2007, Relish Games
 ** hge.relishgames.com
 **
 ** Particle systems editor
@@ -40,14 +40,23 @@ bool FrameFunc()
 	hge->Input_GetMousePos(&state.mx, &state.my);
 	if(hge->Input_GetKeyState(HGEK_RBUTTON)) { psx=state.mx; psy=state.my; }
 	else { psx=400; psy=300; }
-	if(psx > 631) psx=631;
-	if(psx < 168) psx=168;
+
+	if(state.bIFace)
+	{
+		if(psx > 631) psx=631;
+		if(psx < 168) psx=168;
+	}
+
 	state.ps->GetPosition(&px, &py);
 	state.ps->MoveTo(px+(psx-px)*10*dt, py+(psy-py)*10*dt);
 	state.ps->Update(dt);
 
 	if(HandleKeys(hge->Input_GetKey())) return true;
-	if(DoCommands(gui->Update(dt))) return true;
+
+	if(state.bIFace)
+	{
+		if(DoCommands(gui->Update(dt))) return true;
+	}
 
 	GetTextCtrl(CMD_NPARTICLES)->printf("%d", state.ps->GetParticlesAlive());
 	GetTextCtrl(CMD_FPS)->printf("%d", hge->Timer_GetFPS());
@@ -64,31 +73,40 @@ bool RenderFunc()
 	hge->Gfx_Clear(0);
 	hge->Gfx_BeginScene();
 
+	if(state.sprBG)	state.sprBG->Render(400, 300);
+
 	state.ps->Render();
+
 	if(state.bBBox)
 	{
 		state.ps->GetBoundingBox(&bbox);
 		if(!bbox.IsClean()) sprBBox->RenderStretch(bbox.x1, bbox.y1, bbox.x2, bbox.y2);
 	}
 
-	sprLeftPane1->Render(0,0);
-	sprLeftPane2->Render(0,512);
-	sprRightPane1->Render(632,0);
-	sprRightPane2->Render(632,512);
-	
-	gui->Render();
-	sprParticles->SetColor(state.ps->info.colColorStart.GetHWColor() | 0xFF000000);
-	sprParticles->Render(26,189);
-	sprColor->Render(642,221);
+	if(state.bIFace)
+	{
+		sprLeftPane1->Render(0,0);
+		sprLeftPane2->Render(0,512);
+		sprRightPane1->Render(632,0);
+		sprRightPane2->Render(632,512);
+		
+		gui->Render();
+		sprParticles->SetColor(state.ps->info.colColorStart.GetHWColor() | 0xFF000000);
+		sprParticles->Render(26,189);
+		sprColor->Render(642,221);
+	}
+
 	if(state.bHelp)
 	{
 		fnt->SetColor(0xFFFFFFFF);
 		fnt->Render(189, 18, HGETEXT_LEFT, "Left mouse button - fire particle system\n"
 			"Right mouse button - move the system with mouse\n\n"
-			"Keys 1 to 9 - select preset\nPresets are saved and loaded automatically\n"
-			"\nEsc - Exit\n\n"
-			"Edit PARTICLEED.INI file to change the FPS or to run in fullscreen");
+			"Keys 1 to 9 - select preset\nPresets are saved and loaded automatically\n\n"
+			"TAB - Hide editor panels\n"
+			"Esc - Exit\n\n"
+			"Edit PARTICLEED.INI file to change backdrop or fullscreen/windowed mode");
 	}
+
 	if(hge->Input_IsMouseOver() && !hge->Input_GetKeyState(HGEK_RBUTTON)) sprCursor->Render(state.mx, state.my);
 
 	hge->Gfx_EndScene();
@@ -114,8 +132,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	if(hge->Ini_GetInt("HGE", "FullScreen",0))	hge->System_SetState(HGE_WINDOWED, false);
 	else hge->System_SetState(HGE_WINDOWED, true);
 
-	hge->System_SetState(HGE_FPS, hge->Ini_GetInt("HGE", "UpdatesPerSec",0));
-
 	if(hge->System_Initiate())
 	{
 		InitEditor();
@@ -132,9 +148,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 void InitEditor()
 {
 	hgeParticleSystemInfo psi;
-	
+	char *bgName;
+	int bgw, bgh;
+
+	state.texBG = 0;
+	state.sprBG = 0;
+
+	bgName = hge->Ini_GetString("HGE", "Background", 0);
+	if(bgName)
+	{
+		state.texBG = hge->Texture_Load(bgName);
+		bgw = hge->Texture_GetWidth(state.texBG, true);
+		bgh = hge->Texture_GetHeight(state.texBG, true);
+		state.sprBG = new hgeSprite(state.texBG, 0, 0, (float)bgw, (float)bgh);
+		state.sprBG->SetHotSpot((float)bgw/2, (float)bgh/2);
+	}
+
 	hge->Resource_AttachPack("particleed.paq");
 	
+	state.bIFace=true;
 	state.bHelp=false;
 	state.bBBox=false;
 	state.nPreset=0;
@@ -144,7 +176,7 @@ void InitEditor()
 	sprParticles->SetHotSpot(16,16);
 	memset(&psi, 0, sizeof(hgeParticleSystemInfo));
 	psi.sprite=sprParticles;
-	state.ps=new hgeParticleSystem(&psi, 0);
+	state.ps=new hgeParticleSystem(&psi);
 	state.ps->TrackBoundingBox(true);
 	state.ps->MoveTo(psx, psy);
 
@@ -169,6 +201,9 @@ void InitEditor()
 void DoneEditor()
 {
 	cmdSavePreset(state.nPreset);
+
+	if(state.sprBG) delete state.sprBG;
+	if(state.texBG) hge->Texture_Free(state.texBG);
 
 	delete gui;
 	delete sprLeftPane1;
@@ -316,11 +351,11 @@ void CreateGUI()
 	button->SetMode(true);
 	gui->AddCtrl(button);
 	slider=new hgeGUISlider(CMD_PM_STARTSPEEDMIN, 32, 349, 126, 6, texGui, 417, 177, 6, 6);
-	slider->SetMode(-10, 10, HGESLIDER_BARRELATIVE);
+	slider->SetMode(-300, 300, HGESLIDER_BARRELATIVE);
 	slider->SetValue(0);
 	gui->AddCtrl(slider);
 	slider=new hgeGUISlider(CMD_PM_STARTSPEEDMAX, 32, 361, 126, 6, texGui, 417, 177, 6, 6);
-	slider->SetMode(-10, 10, HGESLIDER_BARRELATIVE);
+	slider->SetMode(-300, 300, HGESLIDER_BARRELATIVE);
 	slider->SetValue(0);
 	gui->AddCtrl(slider);
 
@@ -328,11 +363,11 @@ void CreateGUI()
 	button->SetMode(true);
 	gui->AddCtrl(button);
 	slider=new hgeGUISlider(CMD_PM_GRAVITYMIN, 32, 396, 126, 6, texGui, 417, 177, 6, 6);
-	slider->SetMode(-30, 30, HGESLIDER_BARRELATIVE);
+	slider->SetMode(-900, 900, HGESLIDER_BARRELATIVE);
 	slider->SetValue(0);
 	gui->AddCtrl(slider);
 	slider=new hgeGUISlider(CMD_PM_GRAVITYMAX, 32, 408, 126, 6, texGui, 417, 177, 6, 6);
-	slider->SetMode(-30, 30, HGESLIDER_BARRELATIVE);
+	slider->SetMode(-900, 900, HGESLIDER_BARRELATIVE);
 	slider->SetValue(0);
 	gui->AddCtrl(slider);
 
@@ -340,11 +375,11 @@ void CreateGUI()
 	button->SetMode(true);
 	gui->AddCtrl(button);
 	slider=new hgeGUISlider(CMD_PM_RADIALMIN, 32, 443, 126, 6, texGui, 417, 177, 6, 6);
-	slider->SetMode(-30, 30, HGESLIDER_BARRELATIVE);
+	slider->SetMode(-900, 900, HGESLIDER_BARRELATIVE);
 	slider->SetValue(0);
 	gui->AddCtrl(slider);
 	slider=new hgeGUISlider(CMD_PM_RADIALMAX, 32, 455, 126, 6, texGui, 417, 177, 6, 6);
-	slider->SetMode(-30, 30, HGESLIDER_BARRELATIVE);
+	slider->SetMode(-900, 900, HGESLIDER_BARRELATIVE);
 	slider->SetValue(0);
 	gui->AddCtrl(slider);
 
@@ -352,11 +387,11 @@ void CreateGUI()
 	button->SetMode(true);
 	gui->AddCtrl(button);
 	slider=new hgeGUISlider(CMD_PM_TANGENTIALMIN, 32, 490, 126, 6, texGui, 417, 177, 6, 6);
-	slider->SetMode(-30, 30, HGESLIDER_BARRELATIVE);
+	slider->SetMode(-900, 900, HGESLIDER_BARRELATIVE);
 	slider->SetValue(0);
 	gui->AddCtrl(slider);
 	slider=new hgeGUISlider(CMD_PM_TANGENTIALMAX, 32, 502, 126, 6, texGui, 417, 177, 6, 6);
-	slider->SetMode(-30, 30, HGESLIDER_BARRELATIVE);
+	slider->SetMode(-900, 900, HGESLIDER_BARRELATIVE);
 	slider->SetValue(0);
 	gui->AddCtrl(slider);
 

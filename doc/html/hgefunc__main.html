@@ -210,6 +210,43 @@
 <td><a href="hgefunc_musicplay.html">Music_Play</a></td>
 <td>Starts playing music.</td>
 </tr>
+
+<tr>
+<td><a href="hgefunc_musicsetamplification.html">Music_SetAmplification</a></td>
+<td>Sets level of amplification for a music.</td>
+</tr>
+<tr>
+<td><a href="hgefunc_musicgetamplification.html">Music_GetAmplification</a></td>
+<td>Returns level of amplification of a music.</td>
+</tr>
+<tr>
+<td><a href="hgefunc_musicgetlength.html">Music_GetLength</a></td>
+<td>Returns length of a music's patterns list.</td>
+</tr>
+<tr>
+<td><a href="hgefunc_musicsetpos.html">Music_SetPos</a></td>
+<td>Sets music position in patterns and rows.</td>
+</tr>
+<tr>
+<td><a href="hgefunc_musicgetpos.html">Music_GetPos</a></td>
+<td>Returns current position of a music in patterns and rows.</td>
+</tr>
+<tr>
+<td><a href="hgefunc_musicsetinstrvolume.html">Music_SetInstrVolume</a></td>
+<td>Sets volume of a specific instrument in a music.</td>
+</tr>
+<tr>
+<td><a href="hgefunc_musicgetinstrvolume.html">Music_GetInstrVolume</a></td>
+<td>Returns volume of a specific instrument in a music.</td>
+</tr>
+<tr>
+<td><a href="hgefunc_musicsetchannelvolume.html">Music_SetChannelVolume</a></td>
+<td>Sets volume of a specific channel in a music.</td>
+</tr>
+<tr>
+<td><a href="hgefunc_musicgetchannelvolume.html">Music_GetChannelVolume</a></td>
+<td>Returns volume of a specific channel in a music.</td>
+</tr>
 </table>
 </p>
 <h2>Compressed audio stream functions</h2>
@@ -257,12 +294,24 @@
 <td>Stops an audio channel.</td>
 </tr>
 <tr>
+<td><a href="hgefunc_channelpauseall.html">Channel_PauseAll</a></td>
+<td>Pauses all active audio channels.</td>
+</tr>
+<tr>
+<td><a href="hgefunc_channelresumeall.html">Channel_ResumeAll</a></td>
+<td>Resumes all active audio channels.</td>
+</tr>
+<tr>
 <td><a href="hgefunc_channelstopall.html">Channel_StopAll</a></td>
 <td>Stops all active audio channels.</td>
 </tr>
 <tr>
 <td><a href="hgefunc_channelisplaying.html">Channel_IsPlaying</a></td>
 <td>Tests if an audio channel is playing.</td>
+</tr>
+<tr>
+<td><a href="hgefunc_channelgetlength.html">Channel_GetLength</a></td>
+<td>Retrieves the total length of a playing channel.</td>
 </tr>
 <tr>
 <td><a href="hgefunc_channelsetpos.html">Channel_SetPos</a></td>
@@ -273,8 +322,12 @@
 <td>Retrieves a playing channel's position.</td>
 </tr>
 <tr>
-<td><a href="hgefunc_channelgetlength.html">Channel_GetLength</a></td>
-<td>Retrieves the total length of a playing channel.</td>
+<td><a href="hgefunc_channelslideto.html">Channel_SlideTo</a></td>
+<td>Starts sliding a channel volume, panning or pitch.</td>
+</tr>
+<tr>
+<td><a href="hgefunc_channelissliding.html">Channel_IsSliding</a></td>
+<td>Tests if a channel parameters are sliding.</td>
 </tr>
 </table>
 </p>
@@ -296,6 +349,14 @@
 <tr>
 <td><a href="hgefunc_inputismouseover.html">Input_IsMouseOver</a></td>
 <td>Tests if mouse cursor is inside <b>HGE</b> window or not.</td>
+</tr>
+<tr>
+<td><a href="hgefunc_inputkeydown.html">Input_KeyDown</a></td>
+<td>Tests if a key was pressed down during the last frame.</td>
+</tr>
+<tr>
+<td><a href="hgefunc_inputkeyup.html">Input_KeyUp</a></td>
+<td>Tests if a key was released during the last frame.</td>
 </tr>
 <tr>
 <td><a href="hgefunc_inputgetkeyname.html">Input_GetKeyName</a></td>

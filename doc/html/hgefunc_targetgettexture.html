@@ -43,16 +43,15 @@ The results are unpredictable. A render target's texture is deleted
 automatically during render target deletion.
 <br><br>
 The texture handle, returned by <b>Target_GetTexture</b> may change when
-the application loses focus. So, obtain the handle every time you need it.
-If you want to use cached handles you have to update them in your focus gain
-function (see below).
+contents of video memory is lost (eg. mode switching). So, obtain the handle every
+time you need it. If you want to use cached handles you have to update them
+in your <a href="hgeconst_systemstate.html#HGE_GFXRESTOREFUNC">HGE_GFXRESTOREFUNC</a> function.
 <br><br>
-Render targets' content is lost when the application loses focus.
-If you render a texture each frame this is not a problem.
-But if you render it once, at startup - you must rerender it when the
-application gains focus. To do this - write a focus gain function
-and attach it by setting
-<a href="hgeconst_systemstate.html#HGE_FOCUSGAINFUNC">HGE_FOCUSGAINFUNC</a> system state.
+Render targets' content can be lost due to events like video mode switching.
+If you render a texture each frame this is not a problem. But if you render
+it once, at startup - you must rerender it upon signal from <b>HGE</b>.
+To do this - write a rendering function and attach it by setting
+<a href="hgeconst_systemstate.html#HGE_GFXRESTOREFUNC">HGE_GFXRESTOREFUNC</a> system state.
 </p>
 <h2>Requirements</h2>
 <p>

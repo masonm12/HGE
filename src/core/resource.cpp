@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.5
-** Copyright (C) 2003-2004, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** Core functions implementation: resources management
@@ -196,7 +196,10 @@ char* CALL HGE_Impl::Resource_MakePath(const char *filename)
 {
 	int i;
 
-	if(filename[0]=='\\' || filename[0]=='/' || filename[1]==':') strcpy(szTmpFilename, filename);
+	if(!filename)
+		strcpy(szTmpFilename, szAppPath);
+	else if(filename[0]=='\\' || filename[0]=='/' || filename[1]==':')
+		strcpy(szTmpFilename, filename);
 	else
 	{
 		strcpy(szTmpFilename, szAppPath);

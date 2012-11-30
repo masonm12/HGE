@@ -25,7 +25,8 @@ void SetTextureRect(
   float <i><b>x</b></i>,
   float <i><b>y</b></i>,
   float <i><b>w</b></i>,
-  float <i><b>h</b></i>
+  float <i><b>h</b></i>,
+  bool <i><b>adjSize</b></i> = true
 );
 </pre>
 <h2>Parameters</h2>
@@ -38,6 +39,9 @@ void SetTextureRect(
 <dd>The texture region width.
 <dt><i>h</i>
 <dd>The texture region height.
+<dt><i>adjSize</i>
+<dd>If <b>true</b>, the sprite dimensions will be adjusted according to new texture region.
+If <b>false</b> the sprite dimensions will remain as is. Optional.
 </dl>
 <h2>Requirements</h2>
 <p>

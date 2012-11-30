@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.5
-** Copyright (C) 2003-2004, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** Core system functions
@@ -15,6 +15,7 @@
 
 
 const char *WINDOW_CLASS_NAME = "HGE__WNDCLASS";
+
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
 
@@ -22,27 +23,36 @@ int			nRef=0;
 HGE_Impl*	pHGE=0;
 
 
+
 BOOL APIENTRY DllMain(HANDLE, DWORD, LPVOID)
 {
     return TRUE;
 }
 
+
 HGE* CALL hgeCreate(int ver)
 {
-	if(ver==HGE_VERSION) return (HGE*)HGE_Impl::_Interface_Get();
-	else return 0;
+	if(ver==HGE_VERSION)
+		return (HGE*)HGE_Impl::_Interface_Get();
+	else
+		return 0;
 }
+
 
 HGE_Impl* HGE_Impl::_Interface_Get()
 {
 	if(!pHGE) pHGE=new HGE_Impl();
+
 	nRef++;
+
 	return pHGE;
 }
+
 
 void CALL HGE_Impl::Release()
 {
 	nRef--;
+
 	if(!nRef)
 	{
 		if(pHGE->hwnd) pHGE->System_Shutdown();
@@ -61,6 +71,8 @@ bool CALL HGE_Impl::System_Initiate()
 	WNDCLASS		winclass;
 	int				width, height;
 
+	// Log system info
+
 	System_Log("HGE Started..\n");
 
 	System_Log("HGE version: %X.%X", HGE_VERSION>>8, HGE_VERSION & 0xFF);
@@ -74,6 +86,8 @@ bool CALL HGE_Impl::System_Initiate()
 
 	GlobalMemoryStatus(&mem_st);
 	System_Log("Memory: %ldK total, %ldK free\n",mem_st.dwTotalPhys/1024L,mem_st.dwAvailPhys/1024L);
+
+	// Register window class
 	
 	winclass.style = CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
 	winclass.lpfnWndProc	= WindowProc;
@@ -91,6 +105,8 @@ bool CALL HGE_Impl::System_Initiate()
 		_PostError("Can't register window class");
 		return false;
 	}
+
+	// Create window
 
 	width=nScreenWidth + GetSystemMetrics(SM_CXFIXEDFRAME)*2;
 	height=nScreenHeight + GetSystemMetrics(SM_CYFIXEDFRAME)*2 + GetSystemMetrics(SM_CYCAPTION);
@@ -133,8 +149,11 @@ bool CALL HGE_Impl::System_Initiate()
 
 	ShowWindow(hwnd, SW_SHOW);
 
+	// Init subsystems
+
 	timeBeginPeriod(1);
 	Random_Seed();
+	_InputInit();
 	if(!_GfxInit()) { System_Shutdown(); return false; }
 	if(!_SoundInit()) { System_Shutdown(); return false; }
 
@@ -145,13 +164,15 @@ bool CALL HGE_Impl::System_Initiate()
 	dt=cfps=0;
 	nFPS=0;
 
-	#ifdef DEMO
+	// Show splash
+
+#ifdef DEMO
 
 	bool			(*func)();
 	bool			(*rfunc)();
 	HWND			hwndTmp;
 
-	if(~pHGE->nDMO != ~0xFACE0FF) // Commercial version magic
+	if(pHGE->bDMO)
 	{
 		Sleep(200);
 		func=(bool(*)())pHGE->System_GetStateFunc(HGE_FRAMEFUNC);
@@ -167,7 +188,9 @@ bool CALL HGE_Impl::System_Initiate()
 		pHGE->System_SetStateFunc(HGE_RENDERFUNC, rfunc);
 	}
 
-	#endif
+#endif
+
+	// Done
 
 	return true;
 }
@@ -180,6 +203,7 @@ void CALL HGE_Impl::System_Shutdown()
 	_ClearQueue();
 	_SoundDone();
 	_GfxDone();
+
 	if(hwnd)
 	{
 		//ShowWindow(hwnd, SW_HIDE);
@@ -188,6 +212,7 @@ void CALL HGE_Impl::System_Shutdown()
 		DestroyWindow(hwnd);
 		hwnd=0;
 	}
+
 	if(hInstance) UnregisterClass(WINDOW_CLASS_NAME, hInstance);
 
 	System_Log("The End.");
@@ -197,8 +222,6 @@ void CALL HGE_Impl::System_Shutdown()
 bool CALL HGE_Impl::System_Start()
 {
 	MSG		msg;
-	POINT	pt;
-	RECT	rc;
 
 	if(!hwnd)
 	{
@@ -213,9 +236,14 @@ bool CALL HGE_Impl::System_Start()
 
 	bActive=true;
 
+	// MAIN LOOP
+
 	for(;;)
 	{
 		
+		// Process window messages if not in "child mode"
+		// (if in "child mode" the parent application will do this for us)
+
 		if(!hwndParent)
 		{
 			if (PeekMessage(&msg,NULL,0,0,PM_REMOVE))
@@ -227,51 +255,98 @@ bool CALL HGE_Impl::System_Start()
 			}
 		}
 
-		GetCursorPos(&pt);
-		GetClientRect(hwnd, &rc);
-		MapWindowPoints(hwnd, NULL, (LPPOINT)&rc, 2);
-		if(bCaptured || (PtInRect(&rc, pt) && WindowFromPoint(pt)==hwnd)) bMouseOver=true;
-		else bMouseOver=false;
+		// Check if mouse is over HGE window for Input_IsMouseOver
 
-		if(bActive || bDontSuspend) {
+		_UpdateMouse();
+
+		// If HGE window is focused or we have the "don't suspend" state - process the main loop
+
+		if(bActive || bDontSuspend)
+		{
+			// Ensure we have at least 1ms time step
+			// to not confuse user's code with 0
+
 			do { dt=timeGetTime() - t0; } while(dt < 1);
+
+			// If we reached the time for the next frame
+			// or we just run in unlimited FPS mode, then
+			// do the stuff
+
 			if(dt >= nFixedDelta)
 			{
+				// fDeltaTime = time step in seconds returned by Timer_GetDelta
+
 				fDeltaTime=dt/1000.0f;
+
+				// Cap too large time steps usually caused by lost focus to avoid jerks
+
 				if(fDeltaTime > 0.2f)
 				{
-					if(nFixedDelta) fDeltaTime=nFixedDelta/1000.0f;
-					else fDeltaTime=0.01f;
+					fDeltaTime = nFixedDelta ? nFixedDelta/1000.0f : 0.01f;
 				}
-				fTime+=fDeltaTime;
+
+				// Update time counter returned Timer_GetTime
+
+				fTime += fDeltaTime;
+
+				// Store current time for the next frame
+				// and count FPS
 
 				t0=timeGetTime();
-				if(t0-t0fps < 1000) cfps++;
+				if(t0-t0fps <= 1000) cfps++;
 				else {nFPS=cfps; cfps=0; t0fps=t0;}
+
+				// Do user's stuff
+
 				if(procFrameFunc()) break;
 				if(procRenderFunc) procRenderFunc();
+				
+				// If if "child mode" - return after processing single frame
+
 				if(hwndParent) break;
+
+				// Clean up input events that were generated by
+				// WindowProc and weren't handled by user's code
+
 				_ClearQueue();
-				if(!bWindowed && nHGEFPS==HGEFPS_VSYNC) Sleep(1);
+
+				// If we use VSYNC - we could afford a little
+				// sleep to lower CPU usage
+
+				// if(!bWindowed && nHGEFPS==HGEFPS_VSYNC) Sleep(1);
 			}
-			else { if(nFixedDelta && dt+3 < nFixedDelta) Sleep(1); }
+
+			// If we have a fixed frame rate and the time
+			// for the next frame isn't too close, sleep a bit
+
+			else
+			{
+				if(nFixedDelta && dt+3 < nFixedDelta) Sleep(1);
+			}
 		}
+
+		// If main loop is suspended - just sleep a bit
+		// (though not too much to allow instant window
+		// redraw if requested by OS)
+
 		else Sleep(1);
 	}
+
 	_ClearQueue();
+
 	bActive=false;
+
 	return true;
 }
 
 void CALL HGE_Impl::System_SetStateBool(hgeBoolState state, bool value)
 {
-	switch(state) {
+	switch(state)
+	{
 		case HGE_WINDOWED:		if(VertArray || hwndParent) break;
 								if(pD3DDevice && bWindowed != value)
 								{
 									if(d3dppW.BackBufferFormat==D3DFMT_UNKNOWN || d3dppFS.BackBufferFormat==D3DFMT_UNKNOWN) break;
-
-									if(procFocusLostFunc) procFocusLostFunc();
 
 									if(bWindowed) GetWindowRect(hwnd, &rectW);
 									bWindowed=value;
@@ -283,13 +358,13 @@ void CALL HGE_Impl::System_SetStateBool(hgeBoolState state, bool value)
 
 									_GfxRestore();
 									_AdjustWindow();
-
-									if(procFocusGainFunc) procFocusGainFunc();
 								}
 								else bWindowed=value;
 								break;
+
 		case HGE_ZBUFFER:		if(!pD3DDevice)	bZBuffer=value;
 								break;
+
 		case HGE_TEXTUREFILTER: bTextureFilter=value;
 								if(pD3DDevice)
 								{
@@ -306,6 +381,7 @@ void CALL HGE_Impl::System_SetStateBool(hgeBoolState state, bool value)
 									}
 								}
 								break;
+
 		case HGE_USESOUND:		if(bUseSound!=value)
 								{
 									bUseSound=value;
@@ -313,44 +389,61 @@ void CALL HGE_Impl::System_SetStateBool(hgeBoolState state, bool value)
 									if(!bUseSound && hwnd) _SoundDone();
 								}
 								break;
+
 		case HGE_HIDEMOUSE:		bHideMouse=value; break;
+
 		case HGE_DONTSUSPEND:	bDontSuspend=value; break;
+
+		#ifdef DEMO
+		case HGE_SHOWSPLASH:	bDMO=value; break;
+		#endif
 	}
 }
 
 void CALL HGE_Impl::System_SetStateFunc(hgeFuncState state, hgeCallback value)
 {
-	switch(state) {
-		case HGE_FRAMEFUNC:		procFrameFunc=value; break;
-		case HGE_RENDERFUNC:	procRenderFunc=value; break;
-		case HGE_FOCUSLOSTFUNC:	procFocusLostFunc=value; break;
-		case HGE_FOCUSGAINFUNC:	procFocusGainFunc=value; break;
-		case HGE_EXITFUNC:		procExitFunc=value; break;
+	switch(state)
+	{
+		case HGE_FRAMEFUNC:		 procFrameFunc=value; break;
+		case HGE_RENDERFUNC:	 procRenderFunc=value; break;
+		case HGE_FOCUSLOSTFUNC:	 procFocusLostFunc=value; break;
+		case HGE_FOCUSGAINFUNC:	 procFocusGainFunc=value; break;
+		case HGE_GFXRESTOREFUNC: procGfxRestoreFunc=value; break;
+		case HGE_EXITFUNC:		 procExitFunc=value; break;
 	}
 }
 
 void CALL HGE_Impl::System_SetStateHwnd(hgeHwndState state, HWND value)
 {
-	switch(state) {
+	switch(state)
+	{
 		case HGE_HWNDPARENT:	if(!hwnd) hwndParent=value; break;
 	}
 }
 
 void CALL HGE_Impl::System_SetStateInt(hgeIntState state, int value)
 {
-	switch(state) {
+	switch(state)
+	{
 		case HGE_SCREENWIDTH:	if(!pD3DDevice) nScreenWidth=value; break;
+
 		case HGE_SCREENHEIGHT:	if(!pD3DDevice) nScreenHeight=value; break;
+
 		case HGE_SCREENBPP:		if(!pD3DDevice) nScreenBPP=value; break;
+
 		case HGE_SAMPLERATE:	if(!hBass) nSampleRate=value;
 								break;
+
 		case HGE_FXVOLUME:		nFXVolume=value;
 								_SetFXVolume(nFXVolume);
 								break;
+
 		case HGE_MUSVOLUME:		nMusVolume=value;
 								_SetMusVolume(nMusVolume);
 								break;
+
 		case HGE_FPS:			if(VertArray) break;
+
 								if(pD3DDevice)
 								{
 									if((nHGEFPS>=0 && value <0) || (nHGEFPS<0 && value>=0))
@@ -365,18 +458,15 @@ void CALL HGE_Impl::System_SetStateInt(hgeIntState state, int value)
 											d3dppW.SwapEffect = D3DSWAPEFFECT_COPY;
 											d3dppFS.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
 										}
-										if(procFocusLostFunc) procFocusLostFunc();
+										//if(procFocusLostFunc) procFocusLostFunc();
 										_GfxRestore();
-										if(procFocusGainFunc) procFocusGainFunc();
+										//if(procFocusGainFunc) procFocusGainFunc();
 									}
 								}
 								nHGEFPS=value;
 								if(nHGEFPS>0) nFixedDelta=int(1000.0f/value);
 								else nFixedDelta=0;
 								break;
-		#ifdef DEMO
-		case (hgeIntState)14:		nDMO=value; break;
-		#endif
 	}
 }
 
@@ -384,7 +474,8 @@ void CALL HGE_Impl::System_SetStateString(hgeStringState state, const char *valu
 {
 	FILE *hf;
 	
-	switch(state) {
+	switch(state)
+	{
 		case HGE_ICON:			szIcon=value;
 								if(pHGE->hwnd) SetClassLong(pHGE->hwnd, GCL_HICON, (LONG)LoadIcon(pHGE->hInstance, szIcon));
 								break;
@@ -408,41 +499,52 @@ void CALL HGE_Impl::System_SetStateString(hgeStringState state, const char *valu
 
 bool CALL HGE_Impl::System_GetStateBool(hgeBoolState state)
 {
-	switch(state) {
+	switch(state)
+	{
 		case HGE_WINDOWED:		return bWindowed;
 		case HGE_ZBUFFER:		return bZBuffer;
 		case HGE_TEXTUREFILTER:	return bTextureFilter;
 		case HGE_USESOUND:		return bUseSound;
 		case HGE_DONTSUSPEND:	return bDontSuspend;
 		case HGE_HIDEMOUSE:		return bHideMouse;
+
+		#ifdef DEMO
+		case HGE_SHOWSPLASH:	return bDMO;
+		#endif
 	}
+
 	return false;
 }
 
 hgeCallback CALL HGE_Impl::System_GetStateFunc(hgeFuncState state)
 {
-	switch(state) {
+	switch(state)
+	{
 		case HGE_FRAMEFUNC:		return procFrameFunc;
 		case HGE_RENDERFUNC:	return procRenderFunc;
 		case HGE_FOCUSLOSTFUNC:	return procFocusLostFunc;
 		case HGE_FOCUSGAINFUNC:	return procFocusGainFunc;
 		case HGE_EXITFUNC:		return procExitFunc;
 	}
+
 	return NULL;
 }
 
 HWND CALL HGE_Impl::System_GetStateHwnd(hgeHwndState state)
 {
-	switch(state) {
+	switch(state)
+	{
 		case HGE_HWND:			return hwnd;
 		case HGE_HWNDPARENT:	return hwndParent;
 	}
+
 	return 0;
 }
 
 int CALL HGE_Impl::System_GetStateInt(hgeIntState state)
 {
-	switch(state) {
+	switch(state)
+	{
 		case HGE_SCREENWIDTH:	return nScreenWidth;
 		case HGE_SCREENHEIGHT:	return nScreenHeight;
 		case HGE_SCREENBPP:		return nScreenBPP;
@@ -451,6 +553,7 @@ int CALL HGE_Impl::System_GetStateInt(hgeIntState state)
 		case HGE_MUSVOLUME:		return nMusVolume;
 		case HGE_FPS:			return nHGEFPS;
 	}
+
 	return 0;
 }
 
@@ -463,6 +566,7 @@ const char* CALL HGE_Impl::System_GetStateString(hgeStringState state) {
 		case HGE_LOGFILE:		if(szLogFile[0]) return szLogFile;
 								else return 0;
 	}
+
 	return NULL;
 }
 
@@ -474,16 +578,17 @@ char* CALL HGE_Impl::System_GetErrorMessage()
 void CALL HGE_Impl::System_Log(const char *szFormat, ...)
 {
 	FILE *hf = NULL;
-	char tmp[256];
+	va_list ap;
 	
 	if(!szLogFile[0]) return;
 
 	hf = fopen(szLogFile, "a");
 	if(!hf) return;
 
-	vsprintf(tmp, szFormat, (char *)&szFormat+sizeof(szFormat));
+	va_start(ap, szFormat);
+	vfprintf(hf, szFormat, ap);
+	va_end(ap);
 
-	fprintf(hf, tmp);
 	fprintf(hf, "\n");
 
 	fclose(hf);
@@ -529,7 +634,7 @@ HGE_Impl::HGE_Impl()
 {
 	hInstance=GetModuleHandle(0);
 	hwnd=0;
-	bActive=true;
+	bActive=false;
 	szError[0]=0;
 
 	pD3D=0;
@@ -566,6 +671,7 @@ HGE_Impl::HGE_Impl()
 	procRenderFunc=0;
 	procFocusLostFunc=0;
 	procFocusGainFunc=0;
+	procGfxRestoreFunc=0;
 	procExitFunc=0;
 	szIcon=0;
 	strcpy(szWinTitle,"HGE");
@@ -586,9 +692,9 @@ HGE_Impl::HGE_Impl()
 	bDontSuspend=false;
 	hwndParent=0;
 
-	#ifdef DEMO
-	nDMO=0;
-	#endif
+#ifdef DEMO
+	bDMO=true;
+#endif
 
 
 	GetModuleFileName(GetModuleHandle(NULL), szAppPath, sizeof(szAppPath));
@@ -597,25 +703,30 @@ HGE_Impl::HGE_Impl()
 	szAppPath[i+1]=0;
 }
 
-void HGE_Impl::_PostError(char *error) {
+void HGE_Impl::_PostError(char *error)
+{
 	System_Log(error);
 	strcpy(szError,error);
 }
 
-void HGE_Impl::_FocusChange(bool bAct) {
+void HGE_Impl::_FocusChange(bool bAct)
+{
 	bActive=bAct;
-	if(bActive) {
-		_GfxRestore();
+
+	if(bActive)
+	{
 		if(procFocusGainFunc) procFocusGainFunc();
 	}
-	else {
+	else
+	{
 		if(procFocusLostFunc) procFocusLostFunc();
 	}
 }
 
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
-
-	switch(msg) {	
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+{
+	switch(msg)
+	{	
 		case WM_CREATE: 
 			return FALSE;
 		
@@ -637,17 +748,15 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 			return FALSE;
 
 		case WM_SYSKEYDOWN:
-			if(wparam==VK_F4)
+			if(wparam == VK_F4)
 			{
-				if(pHGE->procExitFunc)
-				{
-					if(pHGE->procExitFunc())
-						return DefWindowProc(hwnd, msg, wparam, lparam);
-					else
-						return FALSE;
-				}
-				else
-					return DefWindowProc(hwnd, msg, wparam, lparam);
+				if(pHGE->procExitFunc && !pHGE->procExitFunc()) return FALSE;
+				return DefWindowProc(hwnd, msg, wparam, lparam);
+			}
+			else if(wparam == VK_RETURN)
+			{
+				pHGE->System_SetState(HGE_WINDOWED, !pHGE->System_GetState(HGE_WINDOWED));
+				return FALSE;
 			}
 			else
 			{
@@ -713,12 +822,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 		case WM_SYSCOMMAND:
 			if(wparam==SC_CLOSE)
 			{
-				if(pHGE->procExitFunc)
-				{
-					if(pHGE->procExitFunc()) { pHGE->bActive=false;	return DefWindowProc(hwnd, msg, wparam, lparam); }
-					else return FALSE;
-				}
-				else { pHGE->bActive=false;	return DefWindowProc(hwnd, msg, wparam, lparam); }
+				if(pHGE->procExitFunc && !pHGE->procExitFunc()) return FALSE;
+				pHGE->bActive=false;
+				return DefWindowProc(hwnd, msg, wparam, lparam);
 			}
 			break;
 	}

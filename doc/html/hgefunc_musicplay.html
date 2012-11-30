@@ -23,16 +23,25 @@ Starts playing a music.
 <pre>
 HCHANNEL Music_Play(
   HMUSIC <i><b>music</b></i>,
-  bool <i><b>loop</b></i>
+  bool <i><b>loop</b></i>,
+  int <i><b>volume</b></i> = 100,
+  int <i><b>order</b></i> = -1,
+  int <i><b>row</b></i> = -1
 );
 </pre>
 <h2>Parameters</h2>
 <dl>
 <dt><i>music</i>
 <dd>Handle of a music to be played.
-<dt>loop 
+<dt><i>loop</i>
 <dd>If <b>true</b>, the music is looped until the audio channel is stopped manually.<br>
 If <b>false</b> the music is played once.
+<dt><i>volume</i>
+<dd>Starting volume, 0..100. Optional.
+<dt><i>order</i>
+<dd>Starting order. -1 = use current. Optional.
+<dt><i>row</i>
+<dd>Starting row. -1 = use current. Optional.
 </dl>
 <h2>Return value</h2>
 <p>

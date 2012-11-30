@@ -1,5 +1,5 @@
-Haaf's Game Engine 1.6
-Copyright (C) 2003-2006, Relish Games
+Haaf's Game Engine 1.7
+Copyright (C) 2003-2007, Relish Games
 http://hge.relishgames.com
 
 HGE is an easy to use yet powerful hardware accelerated 2D game engine.

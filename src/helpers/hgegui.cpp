@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.5
-** Copyright (C) 2003-2004, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** hgeGUI helper class implementation
@@ -125,6 +125,47 @@ void hgeGUI::SetCursor(hgeSprite *spr)
 {
 	sprCursor=spr;
 }
+
+
+void hgeGUI::SetColor(DWORD color)
+{
+	hgeGUIObject *ctrl=ctrls;
+
+	while(ctrl)
+	{
+		ctrl->SetColor(color);
+		ctrl=ctrl->next;
+	}
+}
+
+
+void hgeGUI::Reset()
+{
+	hgeGUIObject *ctrl=ctrls;
+
+	while(ctrl)
+	{
+		ctrl->Reset();
+		ctrl=ctrl->next;
+	}
+}
+
+
+void hgeGUI::Move(float dx, float dy)
+{
+	hgeGUIObject *ctrl=ctrls;
+
+	while(ctrl)
+	{
+		ctrl->rect.x1 += dx;
+		ctrl->rect.y1 += dy;
+		ctrl->rect.x2 += dx;
+		ctrl->rect.y2 += dy;
+
+		ctrl=ctrl->next;
+	}
+}
+
 
 void hgeGUI::SetFocus(int id)
 {

@@ -117,13 +117,8 @@ the net instead of standard cast.
 To make your game independent of execution speed,
 scale all your internal speeds by the value, returned by
 <a href="hgefunc_timergetdelta.html">Timer_GetDelta</a>.
-If you use acceleration or other non-linear functions,
-there still may be a problem: approximation with linear
-segments will make different results depending on the
-number of segments. To fix this, accumulate the values returned by
-<a href="hgefunc_timergetdelta.html">Timer_GetDelta</a>
-and update these functions in fixed intervals of time, or just set
-<a href="hgeconst_systemstate.html#HGE_FPS">HGE_FPS</a> system state.
+Alternatively you may set <a href="hgeconst_systemstate.html#HGE_FPS">HGE_FPS</a>
+system state to use fixed FPS mode.
 </p>
 <h2>Resources</h2>
 <p>

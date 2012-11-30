@@ -51,6 +51,19 @@ This state may be set and changed at any time you want.
 <tr><td colspan=4><img src="1.gif" width=1 height=7></td></tr>
 
 <tr>
+<td valign=top><b><a name=HGE_GFXRESTOREFUNC></a>HGE_GFXRESTOREFUNC</b></td>
+<td valign=top>bool*()</td><td valign=top>NULL</td>
+<td>
+Pointer to a user-defined function that will be called when video memory contents is lost
+(eg. video mode switching). All textures are restored automatically and you only need this function
+if you use <a href="hgefunc_targetgettexture.html">render targets</a>. The function takes no parameters.
+If successful, it should return <b>true</b>, otherwise it should return <b>false</b>.
+This state may be set and changed at any time you want.
+</td>
+</tr>
+<tr><td colspan=4><img src="1.gif" width=1 height=7></td></tr>
+
+<tr>
 <td valign=top><a name=HGE_FOCUSLOSTFUNC></a><b>HGE_FOCUSLOSTFUNC</b></td>
 <td valign=top>bool*()</td><td valign=top>NULL</td>
 <td>
@@ -67,9 +80,9 @@ or before video mode change. The function takes no parameters and should always 
 <td valign=top>bool*()</td><td valign=top>NULL</td>
 <td>
 Pointer to a user-defined function that will be called when the application gains focus
-(only when user switches back from another application, not when the main window is created)
-or after video mode change. The function takes no parameters and should always return
-<b>false</b>. This state may be set and changed at any time you want.
+(only when user switches back from another application, not when the main window is created).
+The function takes no parameters and should always return <b>false</b>.
+This state may be set and changed at any time you want.
 </td>
 </tr>
 <tr><td colspan=4><img src="1.gif" width=1 height=7></td></tr>
@@ -297,6 +310,16 @@ returns <b>HGE</b> window handle. Otherwise returns 0.
 Defines <b>HGE</b> parent window handle and turns on child window mode.
 This state must be set before call to <a href="hgefunc_systeminitiate.html">System_Initiate</a>.
 See details <a href="main_childwin.html">here</a>.
+</td>
+</tr>
+<tr><td colspan=4><img src="1.gif" width=1 height=7></td></tr>
+
+<tr>
+<td valign=top><a name=HGE_SHOWSPLASH></a><b>HGE_SHOWSPLASH</b></td>
+<td valign=top>bool</td><td valign=top>true</td>
+<td>
+Specifies whether <b>HGE</b> should show it's splash screen or not. Obviously, to take effect
+this state must be set before call to <a href="hgefunc_systeminitiate.html">System_Initiate</a>.
 </td>
 </tr>
 <tr><td colspan=4><img src="1.gif" width=1 height=7></td></tr>

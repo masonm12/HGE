@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.5
-** Copyright (C) 2003-2004, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** hgeResourceManager resources implementation
@@ -76,7 +76,11 @@ void ScriptParseFileResource(hgeResourceManager *rm, RScriptParser *sp, const ch
 	RResource *rc=(RResource *)rr, *base;
 
 	base = (RResource *)FindRes(rm, restype, basename);
-	if(base) *rc=*base; else rc->resgroup=0;
+	if(base) *rc=*base; else
+	{
+		rc->resgroup=0;
+		rc->filename[0]=0;
+	}
 	rc->handle=0; strcpy(rc->name, name);
 
 	while(ScriptSkipToNextParameter(sp,false))
@@ -398,12 +402,49 @@ void RResource::Free()
 
 void RTexture::Parse(hgeResourceManager *rm, RScriptParser *sp, const char *name, const char *basename)
 {
-	ScriptParseFileResource(rm, sp, name, basename, new RTexture(), RES_TEXTURE);
+	RTexture *rc, *base;
+
+	rc=new RTexture();
+	base = (RTexture *)FindRes(rm, RES_TEXTURE, basename);
+	if(base) *rc=*base;
+	else
+	{
+		rc->resgroup=0;
+		rc->mipmap=false;
+	}
+	rc->handle=0; strcpy(rc->name, name);
+
+	while(ScriptSkipToNextParameter(sp,false))
+	{
+		switch(sp->tokentype)
+		{
+			case TTPAR_FILENAME:
+				sp->get_token(); sp->get_token();
+				strcpy(rc->filename, sp->tkn_string());
+				break;
+
+			case TTPAR_RESGROUP:
+				sp->get_token(); sp->get_token();
+				rc->resgroup=sp->tkn_int();
+				break;
+
+			case TTPAR_MIPMAP:
+				sp->get_token(); sp->get_token();
+				rc->mipmap=sp->tkn_bool();
+				break;
+
+			default:
+				ScriptSkipToNextParameter(sp,true);
+				break;
+		}
+	}
+
+	AddRes(rm, RES_TEXTURE, rc);
 }
 
 DWORD RTexture::Get(hgeResourceManager *rm)
 {
-	if(!handle) handle=(DWORD)hge->Texture_Load(filename);
+	if(!handle) handle=(DWORD)hge->Texture_Load(filename, 0, mipmap);
 	return handle;
 }
 
@@ -436,12 +477,59 @@ void REffect::Free()
 
 void RMusic::Parse(hgeResourceManager *rm, RScriptParser *sp, const char *name, const char *basename)
 {
-	ScriptParseFileResource(rm, sp, name, basename, new RMusic(), RES_MUSIC);
+//	ScriptParseFileResource(rm, sp, name, basename, new RMusic(), RES_MUSIC);
+
+
+	RMusic *rc, *base;
+
+	rc=new RMusic();
+	base = (RMusic *)FindRes(rm, RES_MUSIC, basename);
+
+	if(base) *rc=*base;
+	else
+	{
+		rc->resgroup=0;
+		rc->amplify=50;
+	}
+
+	rc->handle=0; strcpy(rc->name, name);
+
+	while(ScriptSkipToNextParameter(sp,false))
+	{
+		switch(sp->tokentype)
+		{
+			case TTPAR_FILENAME:
+				sp->get_token(); sp->get_token();
+				strcpy(rc->filename, sp->tkn_string());
+				break;
+
+			case TTPAR_RESGROUP:
+				sp->get_token(); sp->get_token();
+				rc->resgroup=sp->tkn_int();
+				break;
+
+			case TTPAR_AMPLIFY:
+				sp->get_token(); sp->get_token();
+				rc->amplify=sp->tkn_int();
+				break;
+
+			default:
+				ScriptSkipToNextParameter(sp,true);
+				break;
+		}
+	}
+
+	AddRes(rm, RES_MUSIC, rc);
 }
 
 DWORD RMusic::Get(hgeResourceManager *rm)
 {
-	if(!handle) handle=(DWORD)hge->Music_Load(filename);
+	if(!handle)
+	{
+		handle=(DWORD)hge->Music_Load(filename);
+		hge->Music_SetAmplification(handle, amplify);
+	}
+
 	return handle;
 }
 
@@ -669,11 +757,13 @@ void RFont::Parse(hgeResourceManager *rm, RScriptParser *sp, const char *name, c
 	else
 	{
 		rc->resgroup=0;
+		rc->mipmap=false;
 		rc->filename[0]=0;
 		rc->blend=BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE;
 		rc->color=0xFFFFFFFF;
 		rc->z=0.5f;
 		rc->scale=1.0f;
+		rc->proportion=1.0f;
 		rc->tracking=0.0f;
 		rc->spacing=1.0f;
 		rc->rotation=0.0f;
@@ -708,6 +798,11 @@ void RFont::Parse(hgeResourceManager *rm, RScriptParser *sp, const char *name, c
 				rc->scale=sp->tkn_float();
 				break;
 
+			case TTPAR_PROPORTION:
+				sp->get_token(); sp->get_token();
+				rc->proportion=sp->tkn_float();
+				break;
+
 			case TTPAR_ROTATION:
 				sp->get_token(); sp->get_token();
 				rc->rotation=sp->tkn_float();
@@ -728,6 +823,11 @@ void RFont::Parse(hgeResourceManager *rm, RScriptParser *sp, const char *name, c
 				rc->resgroup=sp->tkn_int();
 				break;
 
+			case TTPAR_MIPMAP:
+				sp->get_token(); sp->get_token();
+				rc->mipmap=sp->tkn_bool();
+				break;
+
 			default:
 				ScriptSkipToNextParameter(sp, true);
 				break;
@@ -742,11 +842,12 @@ DWORD RFont::Get(hgeResourceManager *rm)
 	hgeFont *fnt;
 	if(!handle)
 	{
-		fnt = new hgeFont(filename);
+		fnt = new hgeFont(filename, mipmap);
 		fnt->SetColor(color);
 		fnt->SetZ(z);
 		fnt->SetBlendMode(blend);
 		fnt->SetScale(scale);
+		fnt->SetProportion(proportion);
 		fnt->SetTracking(tracking);
 		fnt->SetSpacing(spacing);
 		fnt->SetRotation(rotation);
@@ -776,7 +877,6 @@ void RParticle::Parse(hgeResourceManager *rm, RScriptParser *sp, const char *nam
 		rc->resgroup=0;
 		rc->filename[0]=0;
 		rc->spritename[0]=0;
-		rc->fps=50.0f;
 	}
 	rc->handle=0; strcpy(rc->name, name);
 
@@ -792,11 +892,6 @@ void RParticle::Parse(hgeResourceManager *rm, RScriptParser *sp, const char *nam
 			case TTPAR_SPRITE:
 				sp->get_token(); sp->get_token();
 				strcpy(rc->spritename, sp->tkn_string());
-				break;
-
-			case TTPAR_FPS:
-				sp->get_token(); sp->get_token();
-				rc->fps=sp->tkn_float();
 				break;
 
 			case TTPAR_RESGROUP:
@@ -818,7 +913,7 @@ DWORD RParticle::Get(hgeResourceManager *rm)
 	hgeParticleSystem *par;
 	if(!handle)
 	{
-		par = new hgeParticleSystem(filename, rm->GetSprite(spritename), fps);
+		par = new hgeParticleSystem(filename, rm->GetSprite(spritename));
 
 		handle=(DWORD)par;
 	}

@@ -23,7 +23,8 @@ Flips the sprite horizontally and/or vertically.
 <pre>
 void SetFlip(
   bool <i><b>bX</b></i>,
-  bool <i><b>bY</b></i>
+  bool <i><b>bY</b></i>,
+  bool <b>bHotSpot</b> = false
 );
 </pre>
 <h2>Parameters</h2>
@@ -32,6 +33,9 @@ void SetFlip(
 <dd>If <b>true</b>, the sprite will be flipped horizontally.
 <dt><i>bY</i>
 <dd>If <b>true</b>, the sprite will be flipped vertically.
+<dt><i>bHotSpot</i>
+<dd>If <b>true</b>, the flipping will occur relatively to anchor point of the sprite.
+Otherwise just the image is flipped and anchor point remains as is.
 </dl>
 <h2>Requirements</h2>
 <p>

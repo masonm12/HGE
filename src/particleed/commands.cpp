@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.1
-** Copyright (C) 2003, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2007, Relish Games
 ** hge.relishgames.com
 **
 ** Particle systems editor
@@ -17,11 +17,23 @@ bool HandleKeys(int key)
 {
 	switch(key)
 	{
-		case 0: return false;
-		case HGEK_ESCAPE: cmdSavePreset(state.nPreset); return true;
+		case 0:
+			return false;
+
+		case HGEK_ESCAPE:
+			cmdSavePreset(state.nPreset);
+			return true;
+
+		case HGEK_TAB:
+			state.bIFace = !state.bIFace;
+			break;
 
 		case HGEK_LBUTTON:
 			if(state.mx>=168 && state.mx<=631) state.ps->Fire();
+			break;
+
+		case HGEK_SPACE:
+			state.ps->Fire();
 			break;
 
 		case HGEK_1:

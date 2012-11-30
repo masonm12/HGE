@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.5
-** Copyright (C) 2003-2004, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** hgeResourceManager resources header
@@ -53,6 +53,7 @@ struct RResource : public ResDesc
 struct RTexture : public ResDesc
 {
 	char		  filename[MAXRESCHARS];
+	bool		  mipmap;
 
 	static  void  Parse(hgeResourceManager *rm, RScriptParser *sp, const char *name, const char *basename);
 	virtual DWORD Get(hgeResourceManager *rm);
@@ -71,6 +72,7 @@ struct REffect : public ResDesc
 struct RMusic : public ResDesc
 {
 	char		  filename[MAXRESCHARS];
+	int			  amplify;
 
 	static  void  Parse(hgeResourceManager *rm, RScriptParser *sp, const char *name, const char *basename);
 	virtual DWORD Get(hgeResourceManager *rm);
@@ -130,10 +132,12 @@ struct RAnimation : public RSprite
 struct RFont : public ResDesc
 {
 	char		filename[MAXRESCHARS];
+	bool		mipmap;
 	int			blend;
 	DWORD		color;
 	float		z;
 	float		scale;
+	float		proportion;
 	float		tracking;
 	float		spacing;
 	float		rotation;
@@ -147,7 +151,6 @@ struct RParticle : public ResDesc
 {
 	char		filename[MAXRESCHARS];
 	char		spritename[MAXRESCHARS];
-	float		fps;
 
 	static  void  Parse(hgeResourceManager *rm, RScriptParser *sp, const char *name, const char *basename);
 	virtual DWORD Get(hgeResourceManager *rm);

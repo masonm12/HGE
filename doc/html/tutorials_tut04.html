@@ -31,12 +31,12 @@ hgeSprite*   tar;
 HTARGET      target;
 </pre>
 <p>
-When the application loses focus, the render target's texture
-handle may change. So, we write the focus gain function
+During some events like video mode switching, the render target's
+texture handle may change. So, we write the GfxRestoreFunc function
 in which we obtain the new render target's texture:
 </p>
 <pre>
-bool FocusGainFunc()
+bool GfxRestoreFunc()
 {
   if(tar && target)
        tar->SetTexture(hge->Target_GetTexture(target));
@@ -74,10 +74,10 @@ Then we render several instances of the texture to the screen:
   hge->Gfx_EndScene();
 </pre>
 <p>
-In the <b>WinMain</b> function we attach our focus gain function:
+In the <b>WinMain</b> function we attach our GfxRestoreFunc function:
 </p>
 <pre>
-  hge->System_SetState(HGE_FOCUSGAINFUNC, FocusGainFunc);
+  hge->System_SetState(HGE_GFXRESTOREFUNC, GfxRestoreFunc);
 </pre>
 <p>
 Then, after <b>HGE</b> initiation, we create a render target and a sprite 

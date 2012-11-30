@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.5
-** Copyright (C) 2003-2004, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** hgeGUI default controls implementation
@@ -12,15 +12,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef __BORLANDC__
-template <typename T>
-T min(const T & x, const T & y) {
-	if (x < y)
-		return x;
-	else
-		return y;
-}
-#endif
 
 /*
 ** hgeGUIText
@@ -38,7 +29,6 @@ hgeGUIText::hgeGUIText(int _id, float x, float y, float w, float h, hgeFont *fnt
 	tx=x;
 	ty=y+(h-fnt->GetHeight())/2.0f;
 
-	col=0xFFFFFFFF;
 	text[0]=0;
 }
 
@@ -62,7 +52,7 @@ void hgeGUIText::printf(const char *format, ...)
 
 void hgeGUIText::Render()
 {
-	font->SetColor(col);
+	font->SetColor(color);
 	font->Render(tx,ty,align,text);
 }
 
@@ -297,14 +287,17 @@ void hgeGUIListbox::Render()
 	for(i=0;i<nTopItem;i++) pItem=pItem->next;
 	for(i=0;i<GetNumRows();i++)
 	{
+		if(i>=nItems) return;
+
 		if(nTopItem+i == nSelectedItem)
 		{
 			sprHighlight->Render(rect.x1,rect.y1+i*font->GetHeight());
 			font->SetColor(texthilColor);
 		}
-		else font->SetColor(textColor);
+		else
+			font->SetColor(textColor);
+
 		font->Render(rect.x1+3, rect.y1+i*font->GetHeight(), HGETEXT_LEFT, pItem->text);
-		if(i>=nItems) return;
 		pItem=pItem->next;
 	}
 }

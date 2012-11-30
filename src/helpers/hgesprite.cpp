@@ -1,6 +1,6 @@
 /*
-** Haaf's Game Engine 1.5
-** Copyright (C) 2003-2004, Relish Games
+** Haaf's Game Engine 1.7
+** Copyright (C) 2003-2007, Relish Games
 ** hge.relishgames.com
 **
 ** hgeSprite helper class implementation
@@ -34,8 +34,11 @@ hgeSprite::hgeSprite(HTEXTURE texture, float texx, float texy, float w, float h)
 		tex_height = 1.0f;
 	}
 
-	hotX=0; hotY=0;
-	bXFlip=false; bYFlip=false;
+	hotX=0;
+	hotY=0;
+	bXFlip=false;
+	bYFlip=false;
+	bHSFlip=false;
 	quad.tex=texture;
 
 	texx1=texx/tex_width;
@@ -181,9 +184,17 @@ hgeRect* hgeSprite::GetBoundingBoxEx(float x, float y, float rot, float hscale, 
 	return rect;
 }
 
-void hgeSprite::SetFlip(bool bX, bool bY)
+void hgeSprite::SetFlip(bool bX, bool bY, bool bHotSpot)
 {
 	float tx, ty;
+
+	if(bHSFlip && bXFlip) hotX = width - hotX;
+	if(bHSFlip && bYFlip) hotY = height - hotY;
+
+	bHSFlip = bHotSpot;
+	
+	if(bHSFlip && bXFlip) hotX = width - hotX;
+	if(bHSFlip && bYFlip) hotY = height - hotY;
 
 	if(bX != bXFlip)
 	{
@@ -191,6 +202,7 @@ void hgeSprite::SetFlip(bool bX, bool bY)
 		ty=quad.v[0].ty; quad.v[0].ty=quad.v[1].ty; quad.v[1].ty=ty;
 		tx=quad.v[3].tx; quad.v[3].tx=quad.v[2].tx; quad.v[2].tx=tx;
 		ty=quad.v[3].ty; quad.v[3].ty=quad.v[2].ty; quad.v[2].ty=ty;
+
 		bXFlip=!bXFlip;
 	}
 
@@ -200,6 +212,7 @@ void hgeSprite::SetFlip(bool bX, bool bY)
 		ty=quad.v[0].ty; quad.v[0].ty=quad.v[3].ty; quad.v[3].ty=ty;
 		tx=quad.v[1].tx; quad.v[1].tx=quad.v[2].tx; quad.v[2].tx=tx;
 		ty=quad.v[1].ty; quad.v[1].ty=quad.v[2].ty; quad.v[2].ty=ty;
+
 		bYFlip=!bYFlip;
 	}
 }
@@ -244,12 +257,19 @@ void hgeSprite::SetTexture(HTEXTURE tex)
 }
 
 
-void hgeSprite::SetTextureRect(float x, float y, float w, float h)
+void hgeSprite::SetTextureRect(float x, float y, float w, float h, bool adjSize)
 {
 	float tx1, ty1, tx2, ty2;
-	bool bX,bY;
+	bool bX,bY,bHS;
 
-	tx=x; ty=y; width=w; height=h;
+	tx=x;
+	ty=y;
+	
+	if(adjSize)
+	{
+		width=w;
+		height=h;
+	}
 
 	tx1=tx/tex_width; ty1=ty/tex_height;
 	tx2=(tx+w)/tex_width; ty2=(ty+h)/tex_height;
@@ -259,22 +279,24 @@ void hgeSprite::SetTextureRect(float x, float y, float w, float h)
 	quad.v[2].tx=tx2; quad.v[2].ty=ty2; 
 	quad.v[3].tx=tx1; quad.v[3].ty=ty2; 
 
-	bX=bXFlip; bY=bYFlip;
+	bX=bXFlip; bY=bYFlip; bHS=bHSFlip;
 	bXFlip=false; bYFlip=false;
-	SetFlip(bX,bY);
-
-/////////////////// consider animation frame somehow! ////////////////
+	SetFlip(bX,bY,bHS);
 }
 
 
 void hgeSprite::SetColor(DWORD col, int i)
 {
-	if(i!=-1) quad.v[i].col=col;
-	else { quad.v[0].col=quad.v[1].col=quad.v[2].col=quad.v[3].col=col; }
+	if(i != -1)
+		quad.v[i].col = col;
+	else
+		quad.v[0].col = quad.v[1].col = quad.v[2].col = quad.v[3].col = col;
 }
 
 void hgeSprite::SetZ(float z, int i)
 {
-	if(i!=-1) quad.v[i].z=z;
-	else { quad.v[0].z=quad.v[1].z=quad.v[2].z=quad.v[3].z=z; }
+	if(i != -1)
+		quad.v[i].z = z;
+	else
+		quad.v[0].z = quad.v[1].z = quad.v[2].z = quad.v[3].z = z;
 }
